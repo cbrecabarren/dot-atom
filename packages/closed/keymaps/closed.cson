@@ -1,0 +1,19 @@
+# Keybindings require three things to be fully defined: A selector that is
+# matched against the focused element, the keystroke and the command to
+# execute.
+#
+# Below is a basic keybinding which registers on all platforms by applying to
+# the root workspace element.
+
+# For more detailed documentation see
+# https://atom.io/docs/latest/advanced/keymaps
+'.platform-darwin':
+  'ctrl-cmd-p': 'closed:Open File'
+'.platform-linux':
+  'alt-ctrl-p': 'closed:Open File'
+'.platform-darwin .closed-editor atom-text-editor[mini]':
+  'cmd-enter': 'closed:Open Current'
+'.platform-linux .closed-editor atom-text-editor[mini]':
+  'ctrl-enter': 'closed:Open Current'
+'.closed-editor atom-text-editor[mini]':
+  'tab': 'core:confirm'
