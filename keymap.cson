@@ -17,14 +17,12 @@
 #   'ctrl-p': 'core:move-down'
 #
 
-'.platform-darwin':
-  'ctrl-x ctrl-f': 'closed:Open File'
-
 'body':
   'ctrl-x ctrl-s': 'core:save'
   'ctrl-x ctrl-right': 'pane:show-next-item'
   'ctrl-x ctrl-left': 'pane:show-previous-item'
   'ctrl-x ctrl-c': 'application:quit'
+  'ctrl-x ctrl-f': 'closed:Open File'
 
 'atom-text-editor':
   'ctrl-x h': 'core:select-all'
