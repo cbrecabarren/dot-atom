@@ -17,6 +17,7 @@
     ]
     'useReactEditor': true
     'audioBeep': false
+    'autoHideMenuBar': true
   'editor':
     'showIndentGuide': true
     'fontFamily': 'Monaco'
