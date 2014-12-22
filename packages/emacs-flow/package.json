@@ -1,0 +1,42 @@
+{
+  "name": "emacs-flow",
+  "main": "./lib/index",
+  "version": "0.0.3",
+  "description": "Offers Emacs-like indentation functionality",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lee-dohm/emacs-flow"
+  },
+  "license": "MIT",
+  "engines": {
+    "atom": ">0.50.0"
+  },
+  "dependencies": {},
+  "readme": "# Emacs Flow\n\nOffers Emacs-like indentation functionality.\n\n## Installation\n\nThe package can be installed by using the Settings screen and searching for `emacs-flow`.\n\nIt can also be installed from the command line with the command:\n\n```bash\napm install emacs-flow\n```\n\n## Use\n\n### Auto Indenting the Current Line\n\nWith the default keymapping, just press <kbd>TAB</kbd> anywhere on the line you're on to automatically indent it to the proper depth. This feature is *highly* dependent on the current syntax definition being implemented properly.\n\n## Configuration\n\nEmacs Flow has no configuration options at this time.\n\n## Keybinding\n\nI have set the following keybindings for this package:\n\n* <kbd>TAB</kbd> &mdash; Auto-indents the current line in the active editor\n\n## Copyright\n\nCopyright &copy; 2014 by Lee Dohm. See [LICENSE](https://github.com/lee-dohm/emacs-flow/blob/master/LICENSE.md) for details.\n",
+  "readmeFilename": "README.md",
+  "bugs": {
+    "url": "https://github.com/lee-dohm/emacs-flow/issues"
+  },
+  "homepage": "https://github.com/lee-dohm/emacs-flow",
+  "_id": "emacs-flow@0.0.3",
+  "dist": {
+    "shasum": "bd40cac8c74998d6f89c03b8e63aa2ed10c88996"
+  },
+  "_resolved": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-1141118-75361-1o8j5eo/package.tgz",
+  "_from": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-1141118-75361-1o8j5eo/package.tgz",
+  "_atomModuleCache": {
+    "version": 1,
+    "dependencies": [],
+    "extensions": {
+      ".json": [
+        "coffeelint.json",
+        "package.json"
+      ],
+      ".coffee": [
+        "lib/emacs-flow.coffee",
+        "lib/index.coffee"
+      ]
+    },
+    "folders": []
+  }
+}
