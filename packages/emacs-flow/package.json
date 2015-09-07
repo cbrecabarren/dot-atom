@@ -1,29 +1,30 @@
 {
   "name": "emacs-flow",
   "main": "./lib/index",
-  "version": "0.0.3",
+  "version": "0.1.2",
   "description": "Offers Emacs-like indentation functionality",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lee-dohm/emacs-flow"
+    "url": "https://github.com/ComputationalPhysics/emacs-flow"
   },
   "license": "MIT",
   "engines": {
-    "atom": ">0.50.0"
+    "atom": ">=0.164.0"
   },
   "dependencies": {},
-  "readme": "# Emacs Flow\n\nOffers Emacs-like indentation functionality.\n\n## Installation\n\nThe package can be installed by using the Settings screen and searching for `emacs-flow`.\n\nIt can also be installed from the command line with the command:\n\n```bash\napm install emacs-flow\n```\n\n## Use\n\n### Auto Indenting the Current Line\n\nWith the default keymapping, just press <kbd>TAB</kbd> anywhere on the line you're on to automatically indent it to the proper depth. This feature is *highly* dependent on the current syntax definition being implemented properly.\n\n## Configuration\n\nEmacs Flow has no configuration options at this time.\n\n## Keybinding\n\nI have set the following keybindings for this package:\n\n* <kbd>TAB</kbd> &mdash; Auto-indents the current line in the active editor\n\n## Copyright\n\nCopyright &copy; 2014 by Lee Dohm. See [LICENSE](https://github.com/lee-dohm/emacs-flow/blob/master/LICENSE.md) for details.\n",
+  "devDependencies": {
+    "temp": "~0.6.0"
+  },
+  "readme": "# Emacs Flow\n\nOffers Emacs-like indentation functionality.\n\n## WARNING: DEPRECATED\n\nSince I haven't had any time to support or enhance this package, I've decided to unpublish it. I'm leaving the repository here for historic reasons and if anyone wants to take it over, they're free to. There are some v1.0 deprecations that I haven't fixed as well, so it probably shouldn't be used as sample code anymore either :laughing:\n\n## Installation\n\nThe package can be installed by using the Settings screen and searching for `emacs-flow`.\n\nIt can also be installed from the command line with the command:\n\n```bash\napm install emacs-flow\n```\n\n## Use\n\n### Auto Indenting the Current Line\n\nWith the default keymapping, just press <kbd>TAB</kbd> anywhere on the line you're on to automatically indent it to the proper depth. This feature is *highly* dependent on the current syntax definition being implemented properly.\n\n## Configuration\n\nEmacs Flow has no configuration options at this time.\n\n## Keybinding\n\nI have set the following keybindings for this package:\n\n* <kbd>TAB</kbd> &mdash; Auto-indents the current line in the active editor\n\n## Copyright\n\nCopyright &copy; 2014-2015 by [Lee Dohm](http://www.lee-dohm.com). See [LICENSE](https://github.com/lee-dohm/emacs-flow/blob/master/LICENSE.md) for details.\n",
   "readmeFilename": "README.md",
   "bugs": {
-    "url": "https://github.com/lee-dohm/emacs-flow/issues"
+    "url": "https://github.com/ComputationalPhysics/emacs-flow/issues"
   },
-  "homepage": "https://github.com/lee-dohm/emacs-flow",
-  "_id": "emacs-flow@0.0.3",
-  "dist": {
-    "shasum": "bd40cac8c74998d6f89c03b8e63aa2ed10c88996"
-  },
-  "_resolved": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-1141118-75361-1o8j5eo/package.tgz",
-  "_from": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-1141118-75361-1o8j5eo/package.tgz",
+  "homepage": "https://github.com/ComputationalPhysics/emacs-flow",
+  "_id": "emacs-flow@0.1.2",
+  "_shasum": "1f2b82d7ee45e22c562eedfe59eaba375bf014b0",
+  "_resolved": "file:../d-115720-7559-tqin2u/package.tgz",
+  "_from": "../d-115720-7559-tqin2u/package.tgz",
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [],

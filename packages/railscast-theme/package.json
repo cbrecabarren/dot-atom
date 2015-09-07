@@ -1,7 +1,7 @@
 {
   "name": "railscast-theme",
   "theme": "syntax",
-  "version": "0.1.1",
+  "version": "0.3.0",
   "private": false,
   "description": "Atom syntax theme based on Ryan Bates (@rbates) RailsCasts TextMate theme",
   "repository": {
@@ -18,12 +18,10 @@
     "url": "https://github.com/ericfreese/atom-railscast-theme/issues"
   },
   "homepage": "https://github.com/ericfreese/atom-railscast-theme",
-  "_id": "railscast-theme@0.1.1",
-  "dist": {
-    "shasum": "1cae29edbd10be72b284677ab6ba4f0f4cd887bf"
-  },
-  "_resolved": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-114118-2293-mr9x9w/package.tgz",
-  "_from": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-114118-2293-mr9x9w/package.tgz",
+  "_id": "railscast-theme@0.3.0",
+  "_shasum": "07fba382d446ac118fce9580cc76d9a748a418e0",
+  "_resolved": "file:../d-115525-11076-sczv98/package.tgz",
+  "_from": "../d-115525-11076-sczv98/package.tgz",
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [],

@@ -1,7 +1,7 @@
 {
   "name": "atom-monokai",
   "theme": "syntax",
-  "version": "0.5.0",
+  "version": "0.8.0",
   "private": true,
   "description": "Atom syntax theme inspired by monokai. Works with Atom Dark, Light and Seti UI.",
   "repository": {
@@ -12,18 +12,27 @@
   "engines": {
     "atom": ">0.50.0"
   },
+  "keywords": [
+    "monokai",
+    "seti-ui",
+    "dark",
+    "light",
+    "syntax",
+    "adaptive"
+  ],
   "readme": "# atom-monokai theme\n\nAtom syntax theme inspired by [monokai](http://www.monokai.nl/blog/2006/07/15/textmate-color-theme/).\nWorks with Atom Dark, Light and Seti UI.\n\n![](https://raw.github.com/burntime/atom-monokai/master/screenshot.png)\n",
   "readmeFilename": "README.md",
   "bugs": {
     "url": "https://github.com/burntime/atom-monokai/issues"
   },
   "homepage": "https://github.com/burntime/atom-monokai",
-  "_id": "atom-monokai@0.5.0",
+  "_id": "atom-monokai@0.8.0",
   "dist": {
-    "shasum": "32419ca845a1bad2bd8f3b1931b0da2366c23159"
+    "shasum": "4cd9c25def7cd564111f923a3c8e817175abdf4c"
   },
-  "_resolved": "/var/folders/pd/_p2h1mfd2jbgg439_gq3gkncsn_r_0/T/d-11425-73186-yp16hc/package.tgz",
-  "_from": "/Users/cbeltranr/.atom/.node-gyp/.atom/.apm/atom-monokai/0.5.0/package.tgz",
+  "_resolved": "file:../d-115525-11044-j2l6f0/package.tgz",
+  "_from": "../d-115525-11044-j2l6f0/package.tgz",
+  "_shasum": "fb52b9e81b53414424085146203e65375399c16a",
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [],

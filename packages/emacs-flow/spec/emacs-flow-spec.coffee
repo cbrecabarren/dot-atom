@@ -1,30 +1,43 @@
+fs = require 'fs'
+path = require 'path'
+temp = require 'temp'
+
 {WorkspaceView} = require 'atom'
-EmacsFlow = require '../lib/emacs-flow'
 
-# Use the command `window:run-package-specs` (cmd-alt-ctrl-p) to run specs.
-#
-# To run a specific `it` or `describe` block add an `f` to the front (e.g. `fit`
-# or `fdescribe`). Remove the `f` to unfocus the block.
+helper = require './spec-helper'
 
-describe "EmacsFlow", ->
-  activationPromise = null
+describe 'Emacs Flow', ->
+  [editor, buffer, filePath, editorView] = []
 
   beforeEach ->
-    atom.workspaceView = new WorkspaceView
-    activationPromise = atom.packages.activatePackage('emacs-flow')
+    # directory = temp.mkdirSync()
+    # atom.project.setPath(directory)
+    # atom.workspaceView = new WorkspaceView()
+    # atom.workspace = atom.workspaceView.getModel()
 
-  describe "when the emacs-flow:toggle event is triggered", ->
-    it "attaches and then detaches the view", ->
-      expect(atom.workspaceView.find('.emacs-flow')).not.toExist()
+    waitsForPromise ->
+      atom.packages.activatePackage('emacs-flow')
 
-      # This is an activation event, triggering it will cause the package to be
-      # activated.
-      atom.workspaceView.trigger 'emacs-flow:toggle'
+    waitsForPromise ->
+      atom.packages.activatePackage('language-coffee-script')
 
-      waitsForPromise ->
-        activationPromise
+    # runs ->
+      # filePath = path.join(directory, 'emacs-flow.coffee')
 
-      runs ->
-        expect(atom.workspaceView.find('.emacs-flow')).toExist()
-        atom.workspaceView.trigger 'emacs-flow:toggle'
-        expect(atom.workspaceView.find('.emacs-flow')).not.toExist()
+    waitsForPromise ->
+      atom.workspace.open(filePath).then (e) -> editor = e
+
+    runs ->
+      buffer = editor.getBuffer()
+      editorView = atom.views.getView(editor)
+
+  describe 'activation', ->
+    it 'creates the command', ->
+      expect(helper.hasCommand(editorView, 'emacs-flow:auto-indent')).toBeTruthy()
+
+  describe 'deactivation', ->
+    beforeEach ->
+      atom.packages.deactivatePackage('emacs-flow')
+
+    it 'removes the command', ->
+      expect(helper.hasCommand(editorView, 'emacs-flow:auto-indent')).toBeFalsy()
