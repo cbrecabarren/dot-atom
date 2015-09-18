@@ -24,5 +24,18 @@
   'ctrl-x ctrl-c': 'application:quit'
   'ctrl-x ctrl-f': 'closed:Open File'
 
+'.workspace':
+  'ctrl-g': 'core:cancel'
+
 'atom-text-editor':
   'ctrl-x h': 'core:select-all'
+
+'atom-text-editor:not([mini])':
+  'tab tab': 'editor:indent'
+  'tab': 'emacs-flow:auto-indent'
+
+'editor':
+  'ctrl-j': 'editor:newline'
+
+'.editor:not(.mini)':
+  'cltr-tab': 'snippets:expand'
