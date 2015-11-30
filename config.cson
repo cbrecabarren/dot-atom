@@ -22,3 +22,4 @@
     showIndentGuide: true
     fontFamily: "Monaco"
     invisibles: {}
+  pigments: {}
