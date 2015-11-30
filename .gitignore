@@ -2,4 +2,5 @@ compile-cache/
 storage/
 .node-gyp/
 .npm/
+.apm/
 .apm/.apmrc
