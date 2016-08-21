@@ -7,6 +7,7 @@
 
 _ = require 'underscore-plus'
 {Emitter} = require 'emissary'
+{CompositeDisposable} = require 'atom'
 
 module.exports =
 class SearchModel
@@ -55,24 +56,28 @@ class SearchModel
     @history = state.history || []
     # Previous searches.  Each entry is an object with pattern, useRegEx, and caseSensitive.
 
-    # @start()
-    # atom.workspaceView.on 'pane-container:active-pane-item-changed', => @activePaneItemChanged()
+    @start()
+    atom.workspace.onDidStopChangingActivePaneItem (args) =>
+        @activePaneItemChanged()
 
   hasStarted: ->
     return @startMarker is not null
 
   activePaneItemChanged: ->
     if @editSession
-      @editSession.getBuffer().off(".isearch") #TODO: change to dispose of subscription
+      @changeSubscription.dispose()
+      @changeSubscription = null
       @editSession = null
       @destroyResultMarkers()
 
-    @start
+    @start()
 
-  start: (pattern=None)->
+  start: (pattern)->
     # Start a new search.
 
     @cleanup()
+
+    @subscriptions = new CompositeDisposable
 
     if pattern
       @pattern = pattern
@@ -80,8 +85,10 @@ class SearchModel
     paneItem = atom.workspace.getActivePaneItem()
     if paneItem?.getBuffer?()?
       @editSession = paneItem
-      @editSession.getBuffer().onDidStopChanging (args) =>  #TODO: store returned subscription for later disposal
+      @changeSubscription = @editSession.getBuffer().onDidStopChanging (args) =>
         @updateMarkers()
+
+      @subscriptions.add @changeSubscription
 
       markerAttributes =
         invalidate: 'inside'
@@ -110,7 +117,7 @@ class SearchModel
     @cleanup()
 
   slurp: ->
-    cursor = @editSession.getCursor()
+    cursor = @editSession.getCursors()[0]
 
     text = '' # new pattern
 
@@ -120,7 +127,7 @@ class SearchModel
       text = @editSession.getSelectedText()
       if not text.length
         start = cursor.getBufferPosition()
-        end   = cursor.getMoveNextWordBoundaryBufferPosition()
+        end   = cursor.getNextWordBoundaryBufferPosition()
         if end
           text = @editSession.getTextInRange([start, end])
 
@@ -165,13 +172,14 @@ class SearchModel
     @destroyResultMarkers()
 
     if @editSession
-      @editSession.getBuffer().off(".isearch") #TODO: change to dispose of subscription
       @editSession = null
 
     if @pattern and @history[@history.length-1] isnt @pattern
       @history.push(@pattern)
 
     @pattern = ''
+    @subscriptions?.dispose()
+    @changeSubscription?.dispose()
 
   updateMarkers: ->
     if not @editSession? or not @pattern

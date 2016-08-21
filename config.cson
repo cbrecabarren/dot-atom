@@ -1,25 +1,25 @@
 "*":
-  "exception-reporting":
-    userId: "3fb58b1f-bdd2-adab-efb8-2975dc6c23e4"
-  "release-notes":
-    viewedVersion: "0.94.0"
-  welcome:
-    showOnStartup: false
-  metrics:
-    userId: "325bce100c7642d8976ff1c23ba4a1eec37404f1"
   core:
+    audioBeep: false
+    autoHideMenuBar: true
+    disabledPackages: [
+      "metrics"
+    ]
     themes: [
       "atom-dark-ui"
       "railscast-theme"
     ]
-    disabledPackages: [
-      "metrics"
-    ]
     useReactEditor: true
-    audioBeep: false
-    autoHideMenuBar: true
   editor:
-    showIndentGuide: true
     fontFamily: "Monaco"
     invisibles: {}
+    showIndentGuide: true
+  "exception-reporting":
+    userId: "3fb58b1f-bdd2-adab-efb8-2975dc6c23e4"
+  metrics:
+    userId: "325bce100c7642d8976ff1c23ba4a1eec37404f1"
   pigments: {}
+  "release-notes":
+    viewedVersion: "0.94.0"
+  welcome:
+    showOnStartup: false

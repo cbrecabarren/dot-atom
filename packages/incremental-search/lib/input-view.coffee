@@ -27,10 +27,10 @@ class InputView extends View
 
   handleEvents: ->
     # Setup event handlers
-    @findEditor.getModel().onDidStopChanging => @updateSearchText()
+    @subscriptions.add atom.config.observe 'incremental-search.instantSearch', @handleInstantSearchConfigChange.bind(this)
 
     @subscriptions.add atom.commands.add @findEditor.element,
-      'core:confirm': => @trigger('forward') # jump to next match, previously did @stopSearch()
+      'core:confirm': => @stopSearch()
 
     @subscriptions.add atom.commands.add @element,
       'core:close': => @cancelSearch()
@@ -43,11 +43,14 @@ class InputView extends View
     @regexOptionButton.on 'click', @toggleRegexOption
     @caseOptionButton.on 'click', @toggleCaseOption
 
-
-
     @searchModel.on 'updatedOptions', =>
       @updateOptionButtons()
       @updateOptionsLabel()
+
+  handleInstantSearchConfigChange: (instantSearch) ->
+    changeEventListener = if instantSearch then 'onDidChange' else 'onDidStopChanging'
+    @changeSubscription?.dispose()
+    @changeSubscription = @findEditor.getModel()[changeEventListener] => @updateSearchText()
 
   attached: ->
     return if @tooltipSubscriptions?
@@ -91,6 +94,7 @@ class InputView extends View
   destroy: ->
     @subscriptions?.dispose()
     @tooltipSubscriptions?.dispose()
+    @changeSubscription?.dispose()
 
   detach: ->
     @hideAllTooltips()
@@ -119,24 +123,20 @@ class InputView extends View
       pattern = ''
       @findEditor.setText(pattern)
       @searchModel.start(pattern)
-
-    @inputPanel.show()
-    
-    if not @findEditor.hasClass('is-focused')
-      # The cursor isn't in the editor, so this is either a new search or the user was
-      # somewhere else.  Just put the cursor into the editor.
+      @inputPanel.show()
       @findEditor.focus()
-      return
-
-    if @findEditor.getText()
-      # We already have text in the box, so search for the next item
-      @searchModel.findNext()
     else
-      # There is no text in the box so populate with the previous search.
-      if @searchModel.history.length
-        pattern = @searchModel.history[@searchModel.history.length-1]
-        @findEditor.setText(pattern)
-        @searchModel.update({ pattern })
+      @inputPanel.show()
+      @findEditor.focus()
+      if @findEditor.getText()
+        # We already have text in the box, so search for the next item
+        @searchModel.findNext()
+      else
+        # There is no text in the box so populate with the previous search.
+        if @searchModel.history.length
+          pattern = @searchModel.history[@searchModel.history.length-1]
+          @findEditor.setText(pattern)
+          @searchModel.update({ pattern })
 
   stopSearch: ->
     # Enter was pressed, so leave the cursor at its current position and clean up.

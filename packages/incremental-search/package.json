@@ -1,7 +1,7 @@
 {
   "name": "incremental-search",
   "main": "./lib/isearch",
-  "version": "5.0.1",
+  "version": "5.1.0",
   "description": "Incremental search for Atom",
   "activationCommands": {
     "atom-workspace": [
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/gangstead/atom-incremental-search"
+    "url": "git+https://github.com/gangstead/atom-incremental-search.git"
   },
   "bugs": {
     "url": "https://github.com/gangstead/atom-incremental-search/issues"
@@ -25,19 +25,31 @@
     "underscore-plus": "1.x",
     "atom-space-pen-views": "^2.0.3"
   },
-  "readme": "# incremental-search package\n\n**Update I (@gangstead) have taken ownership of the package.  Bear with me as it gets updated and republished**\n\nAn incremental search package for Atom designed for fast navigation.\n\nPress `cmd-i` (OS X) or `ctrl-i` (Windows & Linux) and start typing what you want to find - the\npackage will highlight all instances of what you've typed so far and scroll to the closest\nresult.  Each time you type a character or change the search string, the results are updated\non the fly and the editor is scrolled to the new results.\n\nTo move the cursor forward to the next result, press 'enter' or `cmd-i`/`ctrl-i` again.  To move backwards\nto a previous result press `shift-cmd-i` / `shift-ctrl-i`.  Using these while in the find\neditor will quickly move you through file.\n\nWhen you've found the text you are looking for, press `esc` to stop the search and leave the\ncursor on the search result.  To cancel the search and return to where you started, press `esc`.\n\n## Slurping\n\nIn the find control, pressing `cmd-e` (OS X) or `ctrl-e` (Windows & Linux) will copy text from\nthe text editor into the find control.\n\nWhen a search is started, the find control is empty.  If there is a selection in the text\neditor, the first slurp will copy it.  Otherwise it will copy from the cursor to the end of the\ncurrent word.\n\nOnce a search has begun, slurping copies from the end of the current result to the next word\nboundary.  If a search has begun and there are no results, slurping will do nothing.\n\n## Search Options\n\nThe package supports both case sensitive searching and regular expressions.  The state of the\noptions are displayed next to the search pane's title:\n\n![no options](http://gangstead.github.com/atom-incremental-search/images/label-no-options.png)\n\n![options](http://gangstead.github.com/atom-incremental-search/images/label-options.png)\n\nYou can toggle the options using the buttons on the right of the pane or using `cmd-r` (regular\nexpression) and `cmd-c` (case sensitivity):\n\n![buttons](http://gangstead.github.com/atom-incremental-search/images/buttons.png)\n\nThese options are normally turned off when a search is stopped or canceled so the next search\nstarts without them.  The package setting \"Keep Options After Search\" will cause the options to\nbe kept for the next search.\n\n## Selection and History\n\nWhen you start a search the search editor is normally empty.  Pressing `cmd-i` or `shift-cmd-i`\nagain will populate the search with the last used search.\n\nAt this time only 1 previous search is remembered and it is not stored between sessions.\nIn an update, more history will be stored and each history item will record the options used.\nThe history will also be stored between sessions.\n\n## Overriding Styles\n\nThe default result styles are copied from Atom's find-and-replace package so it will look\nfamiliar, but it uses custom classes which you can style.  To style the current result use\n`atom-text-editor::shadow .isearch-current .region`.  To style other results\n`atom-text-editor::shadow .isearch-result .region`.\n\nFor example, to change the border around the current search result to red, you would add\nthe following to your ~/.atom/styles.less file:\n\n```css\natom-text-editor::shadow .isearch-current .region {\n  border: 1px solid red;\n}\n```\n\n## Key Binding Summary\n\n### OS X\n\nTo start an incremental search:\n\n* `cmd-i` - start a forward incremental search\n* `shift-cmd-i` - start a backward incremental search\n\nOnce you've started an incremental search:\n\n* type text characters to search - the results are updated\n* `cmd-i` - move cursor forward to next result\n* `shift-cmd-i` - move cursor backward to previous result\n* `cmd-e` - slurp\n* `return` - stop the search and leave the cursor where it is\n* `esc` - cancel the search and return the cursor to where it was before searching\n* `cmd-r` - toggle regular expressions\n* `cmd-c` - toggle case sensitivity\n* `cmd-enter` - set focus to the text editor without canceling search\n\n### Windows & Linux\n\nTo start an incremental search:\n\n* `ctrl-i` - start a forward incremental search\n* `shift-ctrl-i` - start a backward incremental search\n\nOnce you've started an incremental search:\n\n* type text characters to search - the results are updated\n* `ctrl-i` - move cursor forward to next result\n* `shift-ctrl-i` - move cursor backward to previous result\n* `ctrl-e` - slurp\n* `return` - stop the search and leave the cursor where it is\n* `esc` - cancel the search and return the cursor to where it was before searching\n* `ctrl-r` - toggle regular expressions\n* `ctrl-c` - toggle case sensitivity\n* `ctrl-enter` - set focus to the text editor without canceling search\n\n### emacs\n\nThere is no built in emacs compatibility, but you can get close by remapping three keys. You\nwill want to copy the keymap from this package into your private keymap.  Note the \".isearch\"\nclass maps keys inside of the incremental-search pane so that `ctrl-w` does not override\nmappings in your text editor.\n\n```\n'.platform-darwin .workspace .editor:not(.mini)':\n  'ctrl-s': 'incremental-search:forward'\n  'ctrl-r': 'incremental-search:backward'\n\n'.platform-darwin .workspace .isearch .editor':\n  'ctrl-s': 'incremental-search:forward'\n  'ctrl-r': 'incremental-search:backward'\n  'ctrl-w' : 'incremental-search:slurp'\n```\n\n## Differences From Atom's Find\n\nThis is heavily based on Atom's find-and-replace package and I appreciate their hard work.\nThere is no reason the features of this package cannot be merged into the find-and-replace\npackage if the functionality is found useful.\n\nThe intention of this package is to improve *navigation*.  Advanced users of editors like vi\nand emacs often excel at moving around in files - in fact, often incremental search is the\n *default* method of moving around.  Pressing arrow keys 10 times or waiting for key repeat\ntimers is very slow.\n\nThis leads to these design elements:\n\n* Searching must be incremental - the editor location must move while you type.\n* The input cursor must stay in the search control so the search text can be quickly updated.\n* Stopping the search and staying should be easy (Enter).\n* Canceling the search and returning to the original location must also be easy (Esc).\n* It must be easy to stop a search, make a change, and restart the search (e.g. cmd-i twice)\n\nAdditionally, the key binding \"footprint\" is as small as possible.  Most keys only take effect\nonce a search has started.  Atom is in real danger of using up all of the keys which is not\ngood for a project designed for extensibility.\n",
+  "configSchema": {
+    "instantSearch": {
+      "type": "boolean",
+      "default": false,
+      "description": "Search as you type, instead of waiting until you stop typing."
+    },
+    "keepOptionsAfterSearch": {
+      "type": "boolean",
+      "default": true,
+      "description": "Keep the values of the Match Case and Use Regex options between searches."
+    }
+  },
+  "readme": "# incremental-search package\n\n**Update : 2/2016** I think I have everything, including slurp, working again.  Please take another look at the package.\n\nUpdate : 5/2015 Under new management: (@gangstead)\n\nAn incremental search package for Atom designed for fast navigation.\n\nPress `cmd-i` (OS X) or `ctrl-i` (Windows & Linux) and start typing what you want to find - the\npackage will highlight all instances of what you've typed so far and scroll to the closest\nresult.  Each time you type a character or change the search string, the results are updated\non the fly and the editor is scrolled to the new results.\n\nTo move the cursor forward to the next result, press `cmd-i`/`ctrl-i` again.  To move backwards\nto a previous result press `shift-cmd-i` / `shift-ctrl-i`.  Using these while in the find\neditor will quickly move you through file.\n\nWhen you've found the text you are looking for, press `enter` to stop the search and leave the\ncursor on the search result.  To cancel the search and return to where you started, press `esc`.\n\n## Slurping\n\nIn the find control, pressing `cmd-e` (OS X) or `ctrl-e` (Windows & Linux) will copy text from\nthe text editor into the find control.\n\nWhen a search is started, the find control is empty.  If there is a selection in the text\neditor, the first slurp will copy it.  Otherwise it will copy from the cursor to the end of the\ncurrent word.\n\nOnce a search has begun, slurping copies from the end of the current result to the next word\nboundary.  If a search has begun and there are no results, slurping will do nothing.\n\n## Search Options\n\nThe package supports both case sensitive searching and regular expressions.  The state of the\noptions are displayed next to the search pane's title:\n\n![no options](http://gangstead.github.com/atom-incremental-search/images/label-no-options.png)\n\n![options](http://gangstead.github.com/atom-incremental-search/images/label-options.png)\n\nYou can toggle the options using the buttons on the right of the pane or using `cmd-r` (regular\nexpression) and `cmd-c` (case sensitivity):\n\n![buttons](http://gangstead.github.com/atom-incremental-search/images/buttons.png)\n\nThese options are normally turned off when a search is stopped or canceled so the next search\nstarts without them.  The package setting \"Keep Options After Search\" will cause the options to\nbe kept for the next search.\n\n## Selection and History\n\nWhen you start a search the search editor is normally empty.  Pressing `cmd-i` or `shift-cmd-i`\nagain will populate the search with the last used search.\n\nAt this time only 1 previous search is remembered and it is not stored between sessions.\nIn an update, more history will be stored and each history item will record the options used.\nThe history will also be stored between sessions.\n\n## Overriding Styles\n\nThe default result styles are copied from Atom's find-and-replace package so it will look\nfamiliar, but it uses custom classes which you can style.  To style the current result use\n`atom-text-editor::shadow .isearch-current .region`.  To style other results\n`atom-text-editor::shadow .isearch-result .region`.\n\nFor example, to change the border around the current search result to red, you would add\nthe following to your ~/.atom/styles.less file:\n\n```css\natom-text-editor::shadow .isearch-current .region {\n  border: 1px solid red;\n}\n```\n\n## Key Binding Summary\n\n### OS X\n\nTo start an incremental search:\n\n* `cmd-i` - start a forward incremental search\n* `shift-cmd-i` - start a backward incremental search\n\nOnce you've started an incremental search:\n\n* type text characters to search - the results are updated\n* `cmd-i` - move cursor forward to next result\n* `shift-cmd-i` - move cursor backward to previous result\n* `cmd-e` - slurp\n* `return` - stop the search and leave the cursor where it is\n* `esc` - cancel the search and return the cursor to where it was before searching\n* `cmd-r` - toggle regular expressions\n* `cmd-c` - toggle case sensitivity\n* `cmd-enter` - set focus to the text editor without canceling search\n\n### Windows & Linux\n\nTo start an incremental search:\n\n* `ctrl-i` - start a forward incremental search\n* `shift-ctrl-i` - start a backward incremental search\n\nOnce you've started an incremental search:\n\n* type text characters to search - the results are updated\n* `ctrl-i` - move cursor forward to next result\n* `shift-ctrl-i` - move cursor backward to previous result\n* `ctrl-e` - slurp\n* `return` - stop the search and leave the cursor where it is\n* `esc` - cancel the search and return the cursor to where it was before searching\n* `ctrl-r` - toggle regular expressions\n* `ctrl-c` - toggle case sensitivity\n* `ctrl-enter` - set focus to the text editor without canceling search\n\n### emacs\n\nThere is no built in emacs compatibility, but you can get close by remapping three keys. You\nwill want to copy the keymap from this package into your private keymap.  Note the \".isearch\"\nclass maps keys inside of the incremental-search pane so that `ctrl-w` does not override\nmappings in your text editor.\n\n```\n'.platform-darwin .workspace .editor:not(.mini)':\n  'ctrl-s': 'incremental-search:forward'\n  'ctrl-r': 'incremental-search:backward'\n\n'.platform-darwin .workspace .isearch .editor':\n  'ctrl-s': 'incremental-search:forward'\n  'ctrl-r': 'incremental-search:backward'\n  'ctrl-w' : 'incremental-search:slurp'\n```\n\n## Differences From Atom's Find\n\nThis is heavily based on Atom's find-and-replace package and I appreciate their hard work.\nThere is no reason the features of this package cannot be merged into the find-and-replace\npackage if the functionality is found useful.\n\nThe intention of this package is to improve *navigation*.  Advanced users of editors like vi\nand emacs often excel at moving around in files - in fact, often incremental search is the\n *default* method of moving around.  Pressing arrow keys 10 times or waiting for key repeat\ntimers is very slow.\n\nThis leads to these design elements:\n\n* Searching must be incremental - the editor location must move while you type.\n* The input cursor must stay in the search control so the search text can be quickly updated.\n* Stopping the search and staying should be easy (Enter).\n* Canceling the search and returning to the original location must also be easy (Esc).\n* It must be easy to stop a search, make a change, and restart the search (e.g. cmd-i twice)\n\nAdditionally, the key binding \"footprint\" is as small as possible.  Most keys only take effect\nonce a search has started.  Atom is in real danger of using up all of the keys which is not\ngood for a project designed for extensibility.\n",
   "readmeFilename": "README.md",
-  "homepage": "https://github.com/gangstead/atom-incremental-search",
-  "_id": "incremental-search@5.0.1",
-  "_shasum": "6e77927981c36cd9486236d02435d0c72b46f8d4",
-  "_resolved": "file:../d-115526-4778-iketpx/package.tgz",
-  "_from": "../d-115526-4778-iketpx/package.tgz",
+  "homepage": "https://github.com/gangstead/atom-incremental-search#readme",
+  "_id": "incremental-search@5.1.0",
+  "_shasum": "acf8efaf670a9eac0785481c0b2d70e54ac97c47",
+  "_resolved": "file:../d-116720-3053-1ihy95/package.tgz",
+  "_from": "../d-116720-3053-1ihy95/package.tgz",
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [
       {
         "name": "atom-space-pen-views",
-        "version": "2.0.5",
+        "version": "2.2.0",
         "path": "node_modules/atom-space-pen-views/lib/main.js"
       },
       {
@@ -47,58 +59,13 @@
       },
       {
         "name": "space-pen",
-        "version": "5.1.1",
+        "version": "5.1.2",
         "path": "node_modules/atom-space-pen-views/node_modules/space-pen/lib/space-pen.js"
       },
       {
         "name": "grim",
-        "version": "1.4.1",
+        "version": "1.5.0",
         "path": "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/lib/grim.js"
-      },
-      {
-        "name": "coffeestack",
-        "version": "1.1.2",
-        "path": "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/index.js"
-      },
-      {
-        "name": "coffee-script",
-        "version": "1.8.0",
-        "path": "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/coffee-script.js"
-      },
-      {
-        "name": "mkdirp",
-        "version": "0.3.5",
-        "path": "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/node_modules/mkdirp/index.js"
-      },
-      {
-        "name": "fs-plus",
-        "version": "2.8.1",
-        "path": "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/lib/fs-plus.js"
-      },
-      {
-        "name": "async",
-        "version": "0.2.10",
-        "path": "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/async/lib/async.js"
-      },
-      {
-        "name": "mkdirp",
-        "version": "0.3.5",
-        "path": "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/mkdirp/index.js"
-      },
-      {
-        "name": "rimraf",
-        "version": "2.2.8",
-        "path": "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/rimraf/rimraf.js"
-      },
-      {
-        "name": "source-map",
-        "version": "0.1.43",
-        "path": "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map.js"
-      },
-      {
-        "name": "amdefine",
-        "version": "0.1.1",
-        "path": "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/node_modules/amdefine/amdefine.js"
       },
       {
         "name": "jquery",
@@ -122,8 +89,18 @@
       },
       {
         "name": "es5-ext",
-        "version": "0.10.7",
+        "version": "0.10.12",
         "path": "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/index.js"
+      },
+      {
+        "name": "es6-iterator",
+        "version": "2.0.0",
+        "path": "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/index.js"
+      },
+      {
+        "name": "es6-symbol",
+        "version": "3.1.0",
+        "path": "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/index.js"
       },
       {
         "name": "es6-iterator",
@@ -174,51 +151,6 @@
         "node_modules/atom-space-pen-views/node_modules/space-pen/lib/space-pen.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/lib/deprecation.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/lib/grim.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/index.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/browser.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/cake.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/coffee-script.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/command.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/grammar.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/helpers.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/index.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/lexer.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/nodes.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/optparse.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/parser.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/register.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/repl.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/rewriter.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/scope.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/sourcemap.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/node_modules/mkdirp/examples/pow.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/node_modules/mkdirp/index.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/register.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/repl.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/lib/fs-plus.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/async/lib/async.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/mkdirp/examples/pow.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/mkdirp/index.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/rimraf/bin.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/rimraf/rimraf.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/Makefile.dryice.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/build/assert-shim.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/build/mini-require.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/build/suffix-browser.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/build/test-prefix.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/build/test-suffix.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map/array-set.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map/base64-vlq.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map/base64.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map/binary-search.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map/mapping-list.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map/source-map-consumer.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map/source-map-generator.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map/source-node.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map/util.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/node_modules/amdefine/amdefine.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/node_modules/amdefine/intercept.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/dist/jquery.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/dist/jquery.min.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/ajax/jsonp.js",
@@ -527,6 +459,21 @@
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/math/trunc/index.js",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/math/trunc/is-implemented.js",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/math/trunc/shim.js",
+        "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/#/chain.js",
+        "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/array.js",
+        "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/for-of.js",
+        "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/get.js",
+        "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/index.js",
+        "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/is-iterable.js",
+        "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/string.js",
+        "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/valid-iterable.js",
+        "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/implement.js",
+        "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/index.js",
+        "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/is-implemented.js",
+        "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/is-native-implemented.js",
+        "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/is-symbol.js",
+        "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/polyfill.js",
+        "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/validate-symbol.js",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/#/index.js",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/#/pad.js",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/epsilon/implement.js",
@@ -545,6 +492,7 @@
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/is-nan/index.js",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/is-nan/is-implemented.js",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/is-nan/shim.js",
+        "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/is-natural.js",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/is-number.js",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/is-safe-integer/implement.js",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/is-safe-integer/index.js",
@@ -571,9 +519,13 @@
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/copy.js",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/count.js",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/create.js",
+        "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/ensure-natural-number-value.js",
+        "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/ensure-natural-number.js",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/eq.js",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/every.js",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/filter.js",
+        "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/find-key.js",
+        "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/find.js",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/first-key.js",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/flatten.js",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/for-each.js",
@@ -584,6 +536,7 @@
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-copy-deep.js",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-copy.js",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-empty.js",
+        "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-number-value.js",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-object.js",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-plain-object.js",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is.js",
@@ -681,6 +634,7 @@
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/string/#/starts-with/index.js",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/string/#/starts-with/is-implemented.js",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/string/#/starts-with/shim.js",
+        "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/string/#/uncapitalize.js",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/string/format-method.js",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/string/from-code-point/implement.js",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/string/from-code-point/index.js",
@@ -719,22 +673,14 @@
       ".json": [
         "node_modules/atom-space-pen-views/node_modules/fuzzaldrin/package.json",
         "node_modules/atom-space-pen-views/node_modules/space-pen/api.json",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/node_modules/mkdirp/package.json",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/package.json",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/async/component.json",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/async/package.json",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/mkdirp/package.json",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/rimraf/package.json",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/package.json",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/node_modules/amdefine/package.json",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/package.json",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/package.json",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/package.json",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/bower.json",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/package.json",
         "node_modules/atom-space-pen-views/node_modules/space-pen/package.json",
         "node_modules/atom-space-pen-views/package.json",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/d/package.json",
+        "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/package.json",
+        "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/package.json",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/package.json",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es6-iterator/package.json",
         "node_modules/emissary/node_modules/es6-weak-map/node_modules/es6-symbol/package.json",
@@ -766,7 +712,7 @@
         ],
         "dependencies": {
           "fuzzaldrin": "^2.1.0",
-          "space-pen": "^5.0.1"
+          "space-pen": "^5.1.2"
         }
       },
       {
@@ -776,7 +722,7 @@
         ],
         "dependencies": {
           "grim": "^1.0.0",
-          "jquery": "^2.1.3",
+          "jquery": "2.1.4",
           "underscore-plus": "1.x"
         }
       },
@@ -786,52 +732,7 @@
           "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim"
         ],
         "dependencies": {
-          "coffeestack": "^1",
           "emissary": "^1.2.0"
-        }
-      },
-      {
-        "paths": [
-          "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack"
-        ],
-        "dependencies": {
-          "coffee-script": "~1.8.0",
-          "fs-plus": "^2.5.0",
-          "source-map": "~0.1.43"
-        }
-      },
-      {
-        "paths": [
-          "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script",
-          "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script"
-        ],
-        "dependencies": {
-          "mkdirp": "~0.3.5"
-        }
-      },
-      {
-        "paths": [
-          "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/lib",
-          "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus"
-        ],
-        "dependencies": {
-          "underscore-plus": "1.x",
-          "mkdirp": "~0.3.5",
-          "rimraf": "~2.2.2",
-          "async": "~0.2.9"
-        }
-      },
-      {
-        "paths": [
-          "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map",
-          "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/build",
-          "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map",
-          "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib",
-          "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/test",
-          "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/test/source-map"
-        ],
-        "dependencies": {
-          "amdefine": ">=0.0.4"
         }
       },
       {
@@ -1023,8 +924,31 @@
           "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/test/string/raw"
         ],
         "dependencies": {
-          "es6-iterator": "~0.1.3",
-          "es6-symbol": "~2.0.1"
+          "es6-iterator": "2",
+          "es6-symbol": "~3.1"
+        }
+      },
+      {
+        "paths": [
+          "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/#",
+          "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator",
+          "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/test/#",
+          "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/test"
+        ],
+        "dependencies": {
+          "d": "^0.1.1",
+          "es5-ext": "^0.10.7",
+          "es6-symbol": "3"
+        }
+      },
+      {
+        "paths": [
+          "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol",
+          "node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/test"
+        ],
+        "dependencies": {
+          "d": "~0.1.1",
+          "es5-ext": "~0.10.11"
         }
       },
       {

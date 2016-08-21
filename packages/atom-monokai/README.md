@@ -14,11 +14,25 @@ Atom syntax theme inspired by [monokai](http://www.monokai.nl/blog/2006/07/15/te
 apm install atom-monokai
 ```
 ## Tested with:
-* Atom Dark & Light UI
-* One Dark & Light
+* Atom Dark
+* One Dark
 * Seti UI
 
 Changelog:
+
+* 0.10.4
+  * color for .support.type.exception #10
+
+* 0.10.3
+  * Fix recursive variable definition #9
+
+* 0.10.0
+  * Some color adjustments
+  * Add syntax-variables
+  * Remove Light UI support for now :(
+
+* 0.9.7
+  * Added highlighting of stdint, and functions
 
 * 0.9.6
   * update Changelog
