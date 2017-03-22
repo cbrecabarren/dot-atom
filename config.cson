@@ -4,7 +4,10 @@
     autoHideMenuBar: true
     disabledPackages: [
       "metrics"
+      "pigments"
+      "spell-check"
     ]
+    telemetryConsent: "no"
     themes: [
       "atom-dark-ui"
       "railscast-theme"
@@ -14,6 +17,7 @@
     fontFamily: "Monaco"
     invisibles: {}
     showIndentGuide: true
+    softWrap: true
   "exception-reporting":
     userId: "3fb58b1f-bdd2-adab-efb8-2975dc6c23e4"
   metrics:

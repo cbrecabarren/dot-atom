@@ -1,0 +1,61 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117221-41914-ynoe6t/package.tgz",
+        "scope": null,
+        "escapedName": null,
+        "name": null,
+        "rawSpec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117221-41914-ynoe6t/package.tgz",
+        "spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117221-41914-ynoe6t/package.tgz",
+        "type": "local"
+      },
+      "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-117221-41914-qhu9lj"
+    ]
+  ],
+  "_from": "../d-117221-41914-ynoe6t/package.tgz",
+  "_id": "rectangular-selection@0.1.0",
+  "_inCache": true,
+  "_installable": true,
+  "_location": "/rectangular-selection",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117221-41914-ynoe6t/package.tgz",
+    "scope": null,
+    "escapedName": null,
+    "name": null,
+    "rawSpec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117221-41914-ynoe6t/package.tgz",
+    "spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117221-41914-ynoe6t/package.tgz",
+    "type": "local"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "file:../d-117221-41914-ynoe6t/package.tgz",
+  "_shasum": "3fb845bc92028af22081deebc1782cbc1cba6bc3",
+  "_shrinkwrap": null,
+  "_spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117221-41914-ynoe6t/package.tgz",
+  "_where": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-117221-41914-qhu9lj",
+  "bugs": {
+    "url": "https://github.com/iguchi1124/rectangular-selection/issues"
+  },
+  "dependencies": {},
+  "description": "Enable rectangular selection.",
+  "devDependencies": {},
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "homepage": "https://github.com/iguchi1124/rectangular-selection#readme",
+  "license": "MIT",
+  "main": "./lib/rectangular-selection",
+  "name": "rectangular-selection",
+  "optionalDependencies": {},
+  "private": true,
+  "readme": "# Rectangular Selection\n\nEnable rectangular selection.\n\n### Keymaps\n\n- Shift + Alt + ↑\n- Shift + Alt + ↓\n",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iguchi1124/rectangular-selection.git"
+  },
+  "version": "0.1.0"
+}
