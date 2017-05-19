@@ -1,16 +1,17 @@
 "*":
+  "color-picker":
+    preferredFormat: "HEX"
   core:
     audioBeep: false
     autoHideMenuBar: true
     disabledPackages: [
       "metrics"
-      "pigments"
       "spell-check"
     ]
     telemetryConsent: "no"
     themes: [
       "atom-dark-ui"
-      "railscast-theme"
+      "railscast"
     ]
     useReactEditor: true
   editor:
@@ -27,3 +28,5 @@
     viewedVersion: "0.94.0"
   welcome:
     showOnStartup: false
+  whitespace:
+    ignoreWhitespaceOnCurrentLine: false

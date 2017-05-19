@@ -1,0 +1,59 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117223-49454-lonn2a/package.tgz",
+        "scope": null,
+        "escapedName": null,
+        "name": null,
+        "rawSpec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117223-49454-lonn2a/package.tgz",
+        "spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117223-49454-lonn2a/package.tgz",
+        "type": "local"
+      },
+      "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-117223-49454-m58yq0"
+    ]
+  ],
+  "_from": "../d-117223-49454-lonn2a/package.tgz",
+  "_id": "modeline@1.1.3",
+  "_inCache": true,
+  "_installable": true,
+  "_location": "/modeline",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117223-49454-lonn2a/package.tgz",
+    "scope": null,
+    "escapedName": null,
+    "name": null,
+    "rawSpec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117223-49454-lonn2a/package.tgz",
+    "spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117223-49454-lonn2a/package.tgz",
+    "type": "local"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "file:../d-117223-49454-lonn2a/package.tgz",
+  "_shasum": "00f466a2e6ef44b6e338404f02f0463be64c298d",
+  "_shrinkwrap": null,
+  "_spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117223-49454-lonn2a/package.tgz",
+  "_where": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-117223-49454-m58yq0",
+  "bugs": {
+    "url": "https://github.com/NiklasRosenstein/atom-modeline/issues"
+  },
+  "dependencies": {},
+  "description": "Support for modelines to specify language, encoding and tab width per file",
+  "devDependencies": {},
+  "engines": {
+    "atom": "*"
+  },
+  "homepage": "https://github.com/NiklasRosenstein/atom-modeline#readme",
+  "license": "MIT",
+  "name": "modeline",
+  "optionalDependencies": {},
+  "readme": "# modeline for Atom\n\nSemicolons are optional.\n\n```\n# mode: python; tab-width: 2; tab: soft; encoding: utf8; coding: utf8\n```\n\n## Todo\n\n- Support comment styles other than `#`\n- Show errors in UI instead of just printing to the console\n\n## License\n\nThe MIT License (MIT)\n\nCopyright (c) 2016  Niklas Rosenstein\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NiklasRosenstein/atom-modeline.git"
+  },
+  "version": "1.1.3"
+}
