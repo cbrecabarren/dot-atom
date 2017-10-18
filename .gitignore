@@ -4,3 +4,5 @@ storage/
 .npm/
 .apm/
 .apm/.apmrc
+recovery/
+blob-store/

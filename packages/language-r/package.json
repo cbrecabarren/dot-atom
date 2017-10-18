@@ -2,40 +2,39 @@
   "_args": [
     [
       {
-        "raw": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117328-98389-1drf6e6/package.tgz",
+        "raw": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11786-60464-1wut41v.0c8ga7zaor/package.tgz",
         "scope": null,
         "escapedName": null,
         "name": null,
-        "rawSpec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117328-98389-1drf6e6/package.tgz",
-        "spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117328-98389-1drf6e6/package.tgz",
+        "rawSpec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11786-60464-1wut41v.0c8ga7zaor/package.tgz",
+        "spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11786-60464-1wut41v.0c8ga7zaor/package.tgz",
         "type": "local"
       },
-      "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-117328-98389-gxtljc"
+      "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-11786-60464-1tro7v6.drohcl3di"
     ]
   ],
-  "_from": "../d-117328-98389-1drf6e6/package.tgz",
-  "_id": "language-r@0.4.1",
+  "_from": "../d-11786-60464-1wut41v.0c8ga7zaor/package.tgz",
+  "_id": "language-r@0.4.2",
   "_inCache": true,
-  "_installable": true,
   "_location": "/language-r",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117328-98389-1drf6e6/package.tgz",
+    "raw": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11786-60464-1wut41v.0c8ga7zaor/package.tgz",
     "scope": null,
     "escapedName": null,
     "name": null,
-    "rawSpec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117328-98389-1drf6e6/package.tgz",
-    "spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117328-98389-1drf6e6/package.tgz",
+    "rawSpec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11786-60464-1wut41v.0c8ga7zaor/package.tgz",
+    "spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11786-60464-1wut41v.0c8ga7zaor/package.tgz",
     "type": "local"
   },
   "_requiredBy": [
     "#USER"
   ],
-  "_resolved": "file:../d-117328-98389-1drf6e6/package.tgz",
-  "_shasum": "77e9e283bd817c74ff5099c12f821544cd5671a3",
+  "_resolved": "file:../d-11786-60464-1wut41v.0c8ga7zaor/package.tgz",
+  "_shasum": "01e32222d7ceefe42c1195bc4fd9160594f6522f",
   "_shrinkwrap": null,
-  "_spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117328-98389-1drf6e6/package.tgz",
-  "_where": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-117328-98389-gxtljc",
+  "_spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11786-60464-1wut41v.0c8ga7zaor/package.tgz",
+  "_where": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-11786-60464-1tro7v6.drohcl3di",
   "author": {
     "name": "Lee Dohm",
     "email": "lee@lee-dohm.com"
@@ -57,11 +56,21 @@
   "license": "MIT",
   "name": "language-r",
   "optionalDependencies": {},
-  "readme": "# R Language - Unmaintained\n\n:rotating_light: This package is no longer maintained. See the [Updates section](#updates) for details. :rotating_light:\n\nA language package for [R](http://www.r-project.org).\n\nOriginally imported from [r.tmbundle](https://github.com/textmate/r.tmbundle).\n\n## Updates\n\nI no longer use R in my daily work and haven't for a couple years. I also no longer have the time to maintain this package properly. If anyone is interested in taking over the maintenance of this package and eventually the repository, please post an [Issue](https://github.com/lee-dohm/language-r/issues/new) with the subject of \"Volunteer Maintainer\". Other Issues and PRs will be closed.\n\n## Copyright\n\nCopyright &copy; 2014-2015 by [Lee Dohm](https://www.lee-dohm.com). See [LICENSE](https://github.com/lee-dohm/language-r/blob/master/LICENSE.md) for details.\n",
+  "readme": "# R Language\n\n![Project unmaintained](https://img.shields.io/badge/project-unmaintained-red.svg)\n\nA language package for [R](http://www.r-project.org).\n\nOriginally imported from [r.tmbundle](https://github.com/textmate/r.tmbundle).\n\n## Unmaintained\n\nThis package is no longer maintained. All issues and PRs have been and will be closed. This is remaining published in the Atom package repository so that people can find it to fork it and create their own version. Hopefully one of them will create a new maintained version.\n\n## Copyright\n\nCopyright &copy; 2014-2016 by [Lee Dohm](https://www.lee-dohm.com). See [LICENSE](https://github.com/lee-dohm/language-r/blob/master/LICENSE.md) for details.\n",
   "readmeFilename": "README.md",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lee-dohm/language-r.git"
   },
-  "version": "0.4.1"
+  "version": "0.4.2",
+  "_atomModuleCache": {
+    "version": 1,
+    "dependencies": [],
+    "extensions": {
+      ".json": [
+        "package.json"
+      ]
+    },
+    "folders": []
+  }
 }
