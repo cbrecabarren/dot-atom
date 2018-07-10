@@ -2,40 +2,39 @@
   "_args": [
     [
       {
-        "raw": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117329-9609-1g801cd.px9bdcmcxr/package.tgz",
+        "raw": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11851-18637-c37wto.6bs4ydgqfr/package.tgz",
         "scope": null,
         "escapedName": null,
         "name": null,
-        "rawSpec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117329-9609-1g801cd.px9bdcmcxr/package.tgz",
-        "spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117329-9609-1g801cd.px9bdcmcxr/package.tgz",
+        "rawSpec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11851-18637-c37wto.6bs4ydgqfr/package.tgz",
+        "spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11851-18637-c37wto.6bs4ydgqfr/package.tgz",
         "type": "local"
       },
-      "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-117329-9609-gyh4b0.t8c3tvgqfr"
+      "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-11851-18637-sayhgn.3lbimp9zfr"
     ]
   ],
-  "_from": "../d-117329-9609-1g801cd.px9bdcmcxr/package.tgz",
-  "_id": "color-picker@2.2.5",
+  "_from": "../d-11851-18637-c37wto.6bs4ydgqfr/package.tgz",
+  "_id": "color-picker@2.3.0",
   "_inCache": true,
-  "_installable": true,
   "_location": "/color-picker",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117329-9609-1g801cd.px9bdcmcxr/package.tgz",
+    "raw": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11851-18637-c37wto.6bs4ydgqfr/package.tgz",
     "scope": null,
     "escapedName": null,
     "name": null,
-    "rawSpec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117329-9609-1g801cd.px9bdcmcxr/package.tgz",
-    "spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117329-9609-1g801cd.px9bdcmcxr/package.tgz",
+    "rawSpec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11851-18637-c37wto.6bs4ydgqfr/package.tgz",
+    "spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11851-18637-c37wto.6bs4ydgqfr/package.tgz",
     "type": "local"
   },
   "_requiredBy": [
     "#USER"
   ],
-  "_resolved": "file:../d-117329-9609-1g801cd.px9bdcmcxr/package.tgz",
-  "_shasum": "92c2b23ff05ca222803fbf2955dce4cb9685efd3",
+  "_resolved": "file:../d-11851-18637-c37wto.6bs4ydgqfr/package.tgz",
+  "_shasum": "11934e5069acd34b27a483b9de20cb359e6ba7b4",
   "_shrinkwrap": null,
-  "_spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117329-9609-1g801cd.px9bdcmcxr/package.tgz",
-  "_where": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-117329-9609-gyh4b0.t8c3tvgqfr",
+  "_spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11851-18637-c37wto.6bs4ydgqfr/package.tgz",
+  "_where": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-11851-18637-sayhgn.3lbimp9zfr",
   "bugs": {
     "url": "https://github.com/thomaslindstrom/color-picker/issues"
   },
@@ -69,5 +68,5 @@
     "type": "git",
     "url": "git+https://github.com/thomaslindstrom/color-picker.git"
   },
-  "version": "2.2.5"
+  "version": "2.3.0"
 }

@@ -1,6 +1,10 @@
 "*":
+  "autocomplete-plus":
+    confirmCompletion: "enter"
+  "clipboard-plus": {}
   "color-picker":
     preferredFormat: "HEX"
+    randomColor: false
   core:
     audioBeep: false
     autoHideMenuBar: true
@@ -8,6 +12,7 @@
       "metrics"
       "spell-check"
       "pigments"
+      "markdown-preview"
     ]
     telemetryConsent: "no"
     themes: [
@@ -15,21 +20,43 @@
       "railscast"
     ]
     useReactEditor: true
+  date:
+    dateFormat: "YYYY-MM-DD"
+    dateTimeFormat: "YYYY-MM-DD HH:mm:ss"
+    timeFormat: "HH:mm:ss"
   editor:
     atomicSoftTabs: false
     autoIndent: false
     fontFamily: "Monaco"
     invisibles: {}
+    scrollPastEnd: true
     showIndentGuide: true
     softWrap: true
   "exception-reporting":
     userId: "3fb58b1f-bdd2-adab-efb8-2975dc6c23e4"
+  "julia-client":
+    enableMenu: true
+    firstBoot: false
   metrics:
     userId: "325bce100c7642d8976ff1c23ba4a1eec37404f1"
   pigments: {}
   "release-notes":
     viewedVersion: "0.94.0"
+  "tool-bar": {}
+  "uber-juno":
+    disable: true
   welcome:
     showOnStartup: false
   whitespace:
     ignoreWhitespaceOnCurrentLine: false
+".js.source":
+  editor:
+    autoIndentOnPaste: false
+    showIndentGuide: true
+    showInvisibles: false
+    tabLength: 2
+    tabType: "soft"
+".jsdoc.source":
+  editor:
+    autoIndentOnPaste: false
+    tabType: "soft"

@@ -1,0 +1,69 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11824-45010-rpgy99.rzyaybke29/package.tgz",
+        "scope": null,
+        "escapedName": null,
+        "name": null,
+        "rawSpec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11824-45010-rpgy99.rzyaybke29/package.tgz",
+        "spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11824-45010-rpgy99.rzyaybke29/package.tgz",
+        "type": "local"
+      },
+      "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-11824-45010-1j7yl5o.njbdquxr"
+    ]
+  ],
+  "_from": "../d-11824-45010-rpgy99.rzyaybke29/package.tgz",
+  "_id": "latex-completions@0.3.3",
+  "_inCache": true,
+  "_location": "/latex-completions",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11824-45010-rpgy99.rzyaybke29/package.tgz",
+    "scope": null,
+    "escapedName": null,
+    "name": null,
+    "rawSpec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11824-45010-rpgy99.rzyaybke29/package.tgz",
+    "spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11824-45010-rpgy99.rzyaybke29/package.tgz",
+    "type": "local"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "file:../d-11824-45010-rpgy99.rzyaybke29/package.tgz",
+  "_shasum": "1b71b4f9392d312bbe9028207da33cc08fa3c9e7",
+  "_shrinkwrap": null,
+  "_spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11824-45010-rpgy99.rzyaybke29/package.tgz",
+  "_where": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-11824-45010-1j7yl5o.njbdquxr",
+  "bugs": {
+    "url": "https://github.com/JunoLab/atom-latex-completions/issues"
+  },
+  "dependencies": {
+    "string-score": "*"
+  },
+  "description": "Easy input for unicode characters",
+  "devDependencies": {},
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "homepage": "https://github.com/JunoLab/atom-latex-completions#readme",
+  "keywords": [],
+  "license": "MIT",
+  "main": "./lib/latex-completions",
+  "name": "latex-completions",
+  "optionalDependencies": {},
+  "providedServices": {
+    "autocomplete.provider": {
+      "versions": {
+        "3.0.0": "provide"
+      }
+    }
+  },
+  "readme": "# LaTeX Completions for Atom\n\nIt's simple enough – Latex Completions takes LaTeX character names such as\n`\\alpha` and replaces them with unicode characters like `α`.\n\n<div align=\"center\"><img src=\"https://raw.githubusercontent.com/JunoLab/atom-latex-completions/master/demo.gif\" /></div>\n",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JunoLab/atom-latex-completions.git"
+  },
+  "version": "0.3.3"
+}
