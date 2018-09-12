@@ -1,7 +1,6 @@
 ResizeDetector = require 'element-resize-detector'
-AnsiConverter = require 'ansi-to-html'
+ansiToHTML = require '../util/ansitohtml'
 {throttle, delay} = require 'underscore-plus'
-converter = new AnsiConverter()
 
 class ConsoleElement extends HTMLElement
   createdCallback: ->
@@ -169,7 +168,7 @@ class ConsoleElement extends HTMLElement
     out = document.createElement 'div'
     item.ansi = ansi
     out.innerText = item.text
-    out.innerHTML = converter.toHtml(out.innerHTML) if ansi
+    out.innerHTML = ansiToHTML(out.innerHTML) if ansi
     out.classList.add type, 'stream'
     out
 
@@ -190,7 +189,7 @@ class ConsoleElement extends HTMLElement
     return unless cell? and text?
     out = cell.querySelector '.stream'
     out.innerText = text
-    out.innerHTML = converter.toHtml(out.innerHTML) if ansi
+    out.innerHTML = ansiToHTML(out.innerHTML) if ansi
 
   updateIcon: ({cell, icon}) ->
     return unless cell? and icon?

@@ -2,44 +2,44 @@
   "_args": [
     [
       {
-        "raw": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11824-45010-rpgy99.rzyaybke29/package.tgz",
+        "raw": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-118720-86082-1b19ry5.dn8yvf5hfr/package.tgz",
         "scope": null,
         "escapedName": null,
         "name": null,
-        "rawSpec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11824-45010-rpgy99.rzyaybke29/package.tgz",
-        "spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11824-45010-rpgy99.rzyaybke29/package.tgz",
+        "rawSpec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-118720-86082-1b19ry5.dn8yvf5hfr/package.tgz",
+        "spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-118720-86082-1b19ry5.dn8yvf5hfr/package.tgz",
         "type": "local"
       },
-      "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-11824-45010-1j7yl5o.njbdquxr"
+      "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-118720-86082-16drpgk.94xb76i529"
     ]
   ],
-  "_from": "../d-11824-45010-rpgy99.rzyaybke29/package.tgz",
-  "_id": "latex-completions@0.3.3",
+  "_from": "../d-118720-86082-1b19ry5.dn8yvf5hfr/package.tgz",
+  "_id": "latex-completions@0.3.5",
   "_inCache": true,
   "_location": "/latex-completions",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11824-45010-rpgy99.rzyaybke29/package.tgz",
+    "raw": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-118720-86082-1b19ry5.dn8yvf5hfr/package.tgz",
     "scope": null,
     "escapedName": null,
     "name": null,
-    "rawSpec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11824-45010-rpgy99.rzyaybke29/package.tgz",
-    "spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11824-45010-rpgy99.rzyaybke29/package.tgz",
+    "rawSpec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-118720-86082-1b19ry5.dn8yvf5hfr/package.tgz",
+    "spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-118720-86082-1b19ry5.dn8yvf5hfr/package.tgz",
     "type": "local"
   },
   "_requiredBy": [
     "#USER"
   ],
-  "_resolved": "file:../d-11824-45010-rpgy99.rzyaybke29/package.tgz",
-  "_shasum": "1b71b4f9392d312bbe9028207da33cc08fa3c9e7",
+  "_resolved": "file:../d-118720-86082-1b19ry5.dn8yvf5hfr/package.tgz",
+  "_shasum": "9cd120c579cb541842b384f3fd1569b9acacb295",
   "_shrinkwrap": null,
-  "_spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11824-45010-rpgy99.rzyaybke29/package.tgz",
-  "_where": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-11824-45010-1j7yl5o.njbdquxr",
+  "_spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-118720-86082-1b19ry5.dn8yvf5hfr/package.tgz",
+  "_where": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-118720-86082-16drpgk.94xb76i529",
   "bugs": {
     "url": "https://github.com/JunoLab/atom-latex-completions/issues"
   },
   "dependencies": {
-    "string-score": "*"
+    "fuzzaldrin-plus": "^0.6.0"
   },
   "description": "Easy input for unicode characters",
   "devDependencies": {},
@@ -65,5 +65,5 @@
     "type": "git",
     "url": "git+https://github.com/JunoLab/atom-latex-completions.git"
   },
-  "version": "0.3.3"
+  "version": "0.3.5"
 }

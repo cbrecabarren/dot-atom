@@ -1,0 +1,61 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-118612-23167-zetmsn.3afx4oyldi/package.tgz",
+        "scope": null,
+        "escapedName": null,
+        "name": null,
+        "rawSpec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-118612-23167-zetmsn.3afx4oyldi/package.tgz",
+        "spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-118612-23167-zetmsn.3afx4oyldi/package.tgz",
+        "type": "local"
+      },
+      "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-118612-23167-1i2cdq1.y7howm6lxr"
+    ]
+  ],
+  "_from": "../d-118612-23167-zetmsn.3afx4oyldi/package.tgz",
+  "_id": "language-crontab@1.0.0",
+  "_inCache": true,
+  "_location": "/language-crontab",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-118612-23167-zetmsn.3afx4oyldi/package.tgz",
+    "scope": null,
+    "escapedName": null,
+    "name": null,
+    "rawSpec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-118612-23167-zetmsn.3afx4oyldi/package.tgz",
+    "spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-118612-23167-zetmsn.3afx4oyldi/package.tgz",
+    "type": "local"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "file:../d-118612-23167-zetmsn.3afx4oyldi/package.tgz",
+  "_shasum": "c4fe09f82366745a624457539e7feb15799b5456",
+  "_shrinkwrap": null,
+  "_spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-118612-23167-zetmsn.3afx4oyldi/package.tgz",
+  "_where": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-118612-23167-1i2cdq1.y7howm6lxr",
+  "bugs": {
+    "url": "https://github.com/aegypius/atom-language-crontab/issues"
+  },
+  "dependencies": {},
+  "description": "Crontab syntax highlighting",
+  "devDependencies": {},
+  "engines": {
+    "atom": ">=1.13.0"
+  },
+  "homepage": "https://github.com/aegypius/atom-language-crontab#readme",
+  "license": "MIT",
+  "name": "language-crontab",
+  "optionalDependencies": {},
+  "readme": "# Crontab language support in Atom\n\n[![Build Status](https://travis-ci.org/aegypius/atom-language-crontab.svg)](https://travis-ci.org/aegypius/atom-language-crontab)\n\nAdds syntax highlighting to [crontab](http://www.unix.com/man-page/linux/5/crontab/) files in Atom\n\nContributions are greatly appreciated. Please fork this repository and open a pull request to add snippets, make grammar tweaks, etc.\n",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aegypius/atom-language-crontab.git"
+  },
+  "styles": [
+    "styles/language-cron.less"
+  ],
+  "version": "1.0.0"
+}

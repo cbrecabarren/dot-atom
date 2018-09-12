@@ -6,12 +6,20 @@ let subs = new CompositeDisposable
 let panes = new Set
 
 function ensurePaneVisible(pane) {
-  if (!(pane && pane.getFlexScale)) return
-  if (pane.getFlexScale() < 0.1) {
+  if (!pane) return
+  if (pane.getFlexScale && pane.getFlexScale() < 0.2) {
     pane.parent.adjustFlexScale()
-    pane.setFlexScale(1)
+    pane.setFlexScale(0.6)
   }
   ensurePaneVisible(pane.parent)
+  ensurePaneContainerVisible(pane)
+}
+
+function ensurePaneContainerVisible(pane) {
+  if (pane.getActiveItem) {
+    let container = atom.workspace.paneContainerForItem(pane.getActiveItem())
+    if (container.isVisible && !container.isVisible()) container.show()
+  }
 }
 
 export default class PaneItem {
@@ -46,7 +54,11 @@ export default class PaneItem {
     subs.add(atom.deserializers.add({
       name: `Ink${this.name}`,
       deserialize: (state) => {
-        let pane = this.fromId(state.id)
+        let opts = {}
+        if (state.persistentState && state.persistentState.opts) {
+          opts = state.persistentState.opts
+        }
+        let pane = this.fromId(state.id, opts)
         if (state.persistentState) pane.persistentState = state.persistentState
         if (pane.currentPane()) return
         return pane
@@ -120,10 +132,17 @@ export default class PaneItem {
   }
 
   ensureVisible (opts = {}) {
-    let p = atom.workspace.getActivePane()
-    prom = this.open(opts)
-    prom.then(() => p.activate())
-    return prom
+    let pane = this.currentPane()
+    if (pane) {
+      ensurePaneVisible(pane)
+      if (pane.getActiveItem() !== this) pane.activateItem(this)
+      return new Promise((resolve) => resolve())
+    } else {
+      let p = atom.workspace.getActivePane()
+      prom = this.open(opts)
+      prom.then(() => p.activate())
+      return prom
+    }
   }
 
   close() {

@@ -1,10 +1,11 @@
 'use babel'
 import { CompositeDisposable } from 'atom'
-import AnsiConverter from 'ansi-to-html'
 import views from '../util/views'
+import ansiToHTML from '../util/ansitohtml'
 
 let { span, div } = views.tags
-let converter = new AnsiConverter()
+
+const MIN_RESULT_WIDTH = 10
 
 export default class ResultView {
   constructor (model, opts = {}) {
@@ -105,22 +106,13 @@ export default class ResultView {
     error ? this.view.classList.add('error') : this.view.classList.remove('error')
     loading ? this.view.classList.add('loading') : this.view.classList.remove('loading')
 
-    if (view.childElementCount == 0) {
-      view.innerHTML = converter.toHtml(view.innerHTML)
-    } else if (view.getElementsByTagName) {
-      let allNodes = view.getElementsByTagName('*')
-      for (let i = -1, l = allNodes.length; ++i < l;) {
-        if (allNodes[i].childElementCount == 0) {
-          allNodes[i].innerHTML = converter.toHtml(allNodes[i].innerHTML)
-        }
-      }
-    }
+    ansiToHTML(view)
 
     this.view.appendChild(view)
 
     // HACK: don't display toolbar for "small" results
     if (this.toolbarView) {
-      if (this.model.type === 'inline' && view.innerHTML.length < 100 ) {
+      if (this.model.type === 'inline' && view.innerHTML && view.innerHTML.length < 100 ) {
         this.toolbarView.classList.add('hide')
       } else {
         this.toolbarView.classList.remove('hide')
@@ -150,17 +142,23 @@ export default class ResultView {
     this.newEdWidth = false
     if (this.overlayElement) {
       let rect = this.view.getBoundingClientRect()
-      this.isVisible = rect.top < edRect.bottom && rect.bottom > edRect.top
       this.left = parseInt(this.getView().parentElement.style.left)
+      this.isVisible = rect.top < edRect.bottom && rect.top + 5 > edRect.top &&
+                       rect.left > edRect.left && rect.left + MIN_RESULT_WIDTH < edRect.right
       this.newEdWidth = edRect.width !== this.lastEdWidth
     }
   }
 
   // only write to the DOM
   updateWidth (edRect) {
+    if (!!this.isVisible) {
+      this.view.style.visibility = 'visible'
+    } else {
+      this.view.style.visibility = 'hidden'
+    }
     if ((this.isVisible && this.newEdWidth) || this.modelUpdated) {
       let w = edRect.width + edRect.left - 40 - this.left
-      if (w < 100) w = 100
+      if (w < MIN_RESULT_WIDTH) w = MIN_RESULT_WIDTH
       this.getView().style.maxWidth = w + 'px'
       this.lastEdWidth = edRect.width
       this.modelUpdated = false

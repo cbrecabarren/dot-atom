@@ -2,39 +2,39 @@
   "_args": [
     [
       {
-        "raw": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11851-18668-1cm9z1v.yl4wunb3xr/package.tgz",
+        "raw": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-118720-86050-18l6l4m.jhlzyqfr/package.tgz",
         "scope": null,
         "escapedName": null,
         "name": null,
-        "rawSpec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11851-18668-1cm9z1v.yl4wunb3xr/package.tgz",
-        "spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11851-18668-1cm9z1v.yl4wunb3xr/package.tgz",
+        "rawSpec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-118720-86050-18l6l4m.jhlzyqfr/package.tgz",
+        "spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-118720-86050-18l6l4m.jhlzyqfr/package.tgz",
         "type": "local"
       },
-      "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-11851-18668-95udwt.v3cwzy3nmi"
+      "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-118720-86050-1m7nxdj.s945597ldi"
     ]
   ],
-  "_from": "../d-11851-18668-1cm9z1v.yl4wunb3xr/package.tgz",
-  "_id": "indent-detective@0.2.1",
+  "_from": "../d-118720-86050-18l6l4m.jhlzyqfr/package.tgz",
+  "_id": "indent-detective@0.2.2",
   "_inCache": true,
   "_location": "/indent-detective",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11851-18668-1cm9z1v.yl4wunb3xr/package.tgz",
+    "raw": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-118720-86050-18l6l4m.jhlzyqfr/package.tgz",
     "scope": null,
     "escapedName": null,
     "name": null,
-    "rawSpec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11851-18668-1cm9z1v.yl4wunb3xr/package.tgz",
-    "spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11851-18668-1cm9z1v.yl4wunb3xr/package.tgz",
+    "rawSpec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-118720-86050-18l6l4m.jhlzyqfr/package.tgz",
+    "spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-118720-86050-18l6l4m.jhlzyqfr/package.tgz",
     "type": "local"
   },
   "_requiredBy": [
     "#USER"
   ],
-  "_resolved": "file:../d-11851-18668-1cm9z1v.yl4wunb3xr/package.tgz",
-  "_shasum": "dd4f72070648cdddc252065afeb74a36cdf954e7",
+  "_resolved": "file:../d-118720-86050-18l6l4m.jhlzyqfr/package.tgz",
+  "_shasum": "d297a0f0b13672f5fc137300c9a5908b1bf5cfed",
   "_shrinkwrap": null,
-  "_spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-11851-18668-1cm9z1v.yl4wunb3xr/package.tgz",
-  "_where": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-11851-18668-95udwt.v3cwzy3nmi",
+  "_spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-118720-86050-18l6l4m.jhlzyqfr/package.tgz",
+  "_where": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-118720-86050-1m7nxdj.s945597ldi",
   "bugs": {
     "url": "https://github.com/JunoLab/atom-indent-detective/issues"
   },
@@ -65,5 +65,5 @@
     "type": "git",
     "url": "git+https://github.com/JunoLab/atom-indent-detective.git"
   },
-  "version": "0.2.1"
+  "version": "0.2.2"
 }

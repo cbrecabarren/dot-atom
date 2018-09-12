@@ -52,6 +52,12 @@ export function view(f) {
 }
 
 export class Progress extends Etch {
+  constructor (props, children) {
+    super(props, children)
+
+    this.tt = null
+  }
+
   render() {
     let vals
     if (this.props.level == null || isNaN(this.props.level)) {
@@ -62,10 +68,20 @@ export class Progress extends Etch {
 
     return <progress className="ink" attributes={vals}/>
   }
+
   writeAfterUpdate() {
     if (this.props.level == null) {
       this.element.removeAttribute('value');
     }
+
+    if (this.props.message) {
+      if (this.tt) this.tt.dispose()
+      this.tt = atom.tooltips.add(this.element, {title: this.props.message})
+    }
+  }
+
+  destroy () {
+    if (this.tt) this.tt.dispose()
   }
 }
 
@@ -121,7 +137,7 @@ export class Button extends Etch {
   }
 }
 
-function toButtons(btns) {
+export function toButtons(btns) {
   return btns.map(btn =>
     btn.type == 'group' ? <div className='btn-group'>{toButtons(btn.children)}</div> :
     btn.icon ?  <Button icon={btn.icon} alt={btn.alt} onclick={btn.onclick} /> :

@@ -255,7 +255,7 @@ export default class Result {
     let listener = () => {
       for (let edid in layers) {
         let res = layers[edid].getMarkers().map((m) => m.result)
-        res.filter((r) => r.style === 'inline')
+        res = res.filter((r) => r.type === 'inline')
         if (res.length === 0) continue
         // DOM reads
         let rect = res[0].editor.element.getBoundingClientRect()
@@ -265,7 +265,7 @@ export default class Result {
       }
       setTimeout(() => {
         process.nextTick(() => window.requestAnimationFrame(listener))
-      }, 15*1000/60)
+      }, 10*1000/60)
     }
     window.requestAnimationFrame(listener)
     return

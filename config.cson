@@ -28,6 +28,7 @@
     atomicSoftTabs: false
     autoIndent: false
     fontFamily: "Monaco"
+    fontSize: 12
     invisibles: {}
     scrollPastEnd: true
     showIndentGuide: true

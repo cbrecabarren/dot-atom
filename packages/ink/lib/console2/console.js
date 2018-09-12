@@ -3,18 +3,23 @@
 
 import etch from 'etch'
 import { Raw } from '../util/etch.js'
-import { CompositeDisposable } from 'atom'
+import { CompositeDisposable, Emitter } from 'atom'
 import { Terminal } from 'xterm'
 import * as fit from 'xterm/lib/addons/fit/fit'
+import * as webLinks from 'xterm/lib/addons/webLinks/webLinks'
+import * as winptyCompat from 'xterm/lib/addons/winptyCompat/winptyCompat'
 import TerminalElement from './view'
 import PaneItem from '../util/pane-item'
 import ResizeDetector from 'element-resize-detector'
 import { debounce, throttle } from 'underscore-plus'
 import { closest } from './helpers'
+import { openExternal } from 'shell'
 
 let getTerminal = el => closest(el, 'ink-terminal').getModel()
 
 Terminal.applyAddon(fit)
+Terminal.applyAddon(webLinks)
+Terminal.applyAddon(winptyCompat)
 
 var subs
 
@@ -38,6 +43,9 @@ export default class InkTerminal extends PaneItem {
       if (item instanceof InkTerminal) {
         item.view.initialize(item)
         item.terminal.focus()
+        if (item.ty) {
+          item.tyResize(item.terminal.proposeGeometry())
+        }
       }
     }))
   }
@@ -47,6 +55,7 @@ export default class InkTerminal extends PaneItem {
   }
 
   name = 'InkTerminal'
+  title = 'Terminal'
 
   constructor (opts) {
     super()
@@ -61,7 +70,12 @@ export default class InkTerminal extends PaneItem {
     }, opts)
 
     this.terminal = new Terminal(opts)
-    this.persistentState = {}
+    this.emitter = new Emitter()
+
+    webLinks.webLinksInit(this.terminal, (ev, uri) => openExternal(uri))
+    this.terminal.winptyCompatInit()
+
+    this.persistentState = {opts}
     this.classname = ''
 
     this.enterhandler = (e) => {
@@ -81,6 +95,8 @@ export default class InkTerminal extends PaneItem {
     etch.update(this).then(() => {
       this.view.initialize(this)
     })
+
+    this.terminal.on('title', (t) => this.setTitle(t))
   }
 
   set class (name) {
@@ -88,7 +104,29 @@ export default class InkTerminal extends PaneItem {
     this.view.className = name
   }
 
-  update() {}
+  setTitle (t, force) {
+    if (force == undefined) {
+      if (!this.forced) {
+        this.title = t
+        this.emitter.emit('change-title', t)
+      }
+    } else {
+      this.forced = force
+      this.title = t
+      this.emitter.emit('change-title', t)
+    }
+  }
+
+  onDidChangeTitle (f) {
+    return this.emitter.on('change-title', f)
+  }
+
+  cursorPosition () {
+    this.write('\x1b[0m')
+    return [this.terminal._core.buffer.x, this.terminal._core.buffer.y]
+  }
+
+  update () {}
 
   render () {
     return <Raw>{this.view}</Raw>
@@ -100,6 +138,8 @@ export default class InkTerminal extends PaneItem {
 
   onAttached () {
     this.view.initialize(this)
+    // force resize
+    if (this.ty) this.tyResize(this.terminal.proposeGeometry())
   }
 
   attachCustomKeyEventHandler (f, keepDefault = true) {
@@ -114,7 +154,7 @@ export default class InkTerminal extends PaneItem {
   }
 
   attach (ty, clear = false, cwd = '') {
-    if (!ty || !(ty.on)) {
+    if (!ty || !(ty.on) || !(ty.resize) || !(ty.write)) {
       throw new Error('Tried attaching invalid pty.')
     }
 
@@ -132,6 +172,10 @@ export default class InkTerminal extends PaneItem {
     this.terminal.on('data', this.tyWrite)
     this.terminal.on('resize', this.tyResize)
     this.ty.on('data', (data) => this.terminal.write(data))
+
+    if (this.element.parentElement) {
+      this.tyResize(this.terminal.proposeGeometry())
+    }
 
     if (clear) this.clear()
   }
@@ -189,7 +233,7 @@ export default class InkTerminal extends PaneItem {
   }
 
   getTitle() {
-    return 'Terminal'
+    return this.title
   }
 
   getIconName() {
@@ -198,4 +242,3 @@ export default class InkTerminal extends PaneItem {
 }
 
 InkTerminal.registerView()
-atom.deserializers.add(InkTerminal)

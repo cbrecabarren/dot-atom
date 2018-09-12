@@ -143,7 +143,7 @@ export class WebviewHandler {
     })
   }
 
-  public updateImages(oldSource: string, version: number | false) {
+  public updateImages(oldSource: string, version: number | undefined) {
     this._element.send<'update-images'>('update-images', {
       oldsrc: oldSource,
       v: version,
@@ -192,8 +192,8 @@ export class WebviewHandler {
     }
   }
 
-  public sync(line: number) {
-    this._element.send<'sync'>('sync', { line })
+  public sync(line: number, flash: boolean) {
+    this._element.send<'sync'>('sync', { line, flash })
   }
 
   public async syncSource() {

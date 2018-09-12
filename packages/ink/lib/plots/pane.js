@@ -9,7 +9,6 @@ import { toView, Toolbar, Button, Icon, BackgroundMessage } from '../util/etch'
 let defaultPane
 
 export default class PlotPane extends PaneItem {
-
   static activate() {
     defaultPane = PlotPane.fromId('default')
     atom.workspace.addOpener(uri => {
@@ -19,17 +18,21 @@ export default class PlotPane extends PaneItem {
     })
   }
 
-  constructor() {
+  constructor(opts) {
     super()
 
+    this.counter = 0
     this.items = []
+    this.ids = []
     this.currentItem = -1
 
     etch.initialize(this)
     this.element.setAttribute('tabindex', -1)
   }
 
-  update() {}
+  update() {
+    return etch.update(this)
+  }
 
   render() {
     let currentItem
@@ -44,16 +47,30 @@ export default class PlotPane extends PaneItem {
         <Button icon='arrow-left' alt='Previous' disabled = {this.currentItem <= 0} onclick={() => this.previousPlot()}/>
         <Button icon='arrow-right' alt='Next'  disabled = {this.currentItem >= (this.items.length - 1)} onclick={() => this.nextPlot()}/>
       </div>,
-      <Button icon='circle-slash' alt='Forget Plot' disabled = {currentItem == undefined} onclick={() => this.teardown()} />
+      <div className='btn-group'>
+        <Button icon='x' alt='Forget Plot' disabled = {currentItem == undefined} onclick={() => this.teardown()} />
+        <Button icon='circle-slash' alt='Forget All Plots' disabled = {currentItem == undefined} onclick={() => this.clearAll()} />
+      </div>
     ];
     if (currentItem && currentItem.toolbar) buttons = buttons.concat(toView(currentItem.toolbar))
+
+    let els = []
+    for (let i = 0; i < this.items.length; i++) {
+       els.push(
+         <div className="fill"
+              style={`display:${i == this.currentItem ? 'initial' : 'none'}`}
+              key = {this.ids[i]}>
+           {toView(this.items[i])}
+         </div>)
+     }
+
     return <span className='ink-plot-pane'>
-    <Toolbar items={buttons}>
-      <div className='fill'>
-        {toView(currentItem)}
-      </div>
-    </Toolbar>
-    </span>
+             <Toolbar items={buttons}>
+               <div className="ink-plot-pane-container fill">
+                 {els}
+               </div>
+             </Toolbar>
+           </span>
   }
 
   deactivateCurrentItem () {
@@ -74,7 +91,8 @@ export default class PlotPane extends PaneItem {
     this.deactivateCurrentItem()
     this.currentItem = ind
     this.activateCurrentItem()
-    etch.update(this)
+
+    etch.update(this, false)
   }
 
   previousPlot () {
@@ -95,20 +113,32 @@ export default class PlotPane extends PaneItem {
 
   show (view) {
     if (view) {
+      this.ids.push(this.counter += 1)
       this.items.push(view)
       this.activateItem(this.items.length - 1)
     }
-    etch.update(this)
+    etch.update(this, false)
   }
 
   teardown () {
     if (this.items[this.currentItem] && this.items[this.currentItem].teardown) this.items[this.currentItem].teardown()
+
+    this.ids.splice(this.currentItem, 1)
     this.items.splice(this.currentItem, 1)
+
     if (!(this.currentItem < this.items.length - 1)) {
       this.activateItem(this.items.length - 1)
     } else {
       this.activateItem(this.currentItem)
     }
+  }
+
+  clearAll () {
+    this.items.forEach(item => item.teardown && item.teardown())
+    this.ids = []
+    this.items = []
+
+    this.activateItem(-1)
   }
 
   getTitle() {
