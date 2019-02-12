@@ -4,7 +4,6 @@ declare interface ChannelMap {
   style: { styles: string[] }
   'update-images': { oldsrc: string; v: number | undefined }
   sync: { line: number; flash: boolean }
-  'use-github-style': { value: boolean }
   'update-preview': {
     id: number
     html: string
@@ -31,6 +30,7 @@ declare interface ChannelMap {
 declare interface ReplyMap {
   'zoom-in': void
   'zoom-out': void
+  'uncaught-error': { message: string; name: string; stack?: string }
   'did-scroll-preview': { max: number; min: number }
   // actual replies
   'request-reply': RequestReplyType[keyof RequestReplyMap]

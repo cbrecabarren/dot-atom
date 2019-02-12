@@ -34,4 +34,4 @@
 'atom-text-editor:not([mini])':
   'tab tab': 'editor:indent'
   'tab': 'emacs-flow:auto-indent'
-  'cltr-tab': 'snippets:expand'
+  'ctrl-<': 'snippets:expand'

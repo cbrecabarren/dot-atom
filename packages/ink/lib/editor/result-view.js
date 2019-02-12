@@ -5,7 +5,8 @@ import ansiToHTML from '../util/ansitohtml'
 
 let { span, div } = views.tags
 
-const MIN_RESULT_WIDTH = 10
+const MIN_RESULT_WIDTH = 30
+const RESULT_OFFSET = 20
 
 export default class ResultView {
   constructor (model, opts = {}) {
@@ -79,7 +80,6 @@ export default class ResultView {
 
     this.view.addEventListener('click', () => {
       if (!(this.overlayElement && this.overlayElement.parentNode)) return
-      this.overlayElement.parentNode.appendChild(this.overlayElement)
       let edView
       if (edView = atom.views.getView(atom.workspace.getActiveTextEditor())) {
         edView.focus()
@@ -139,28 +139,38 @@ export default class ResultView {
   decideUpdateWidth (edRect) {
     this.isVisible = false
     this.left = 0
-    this.newEdWidth = false
+    this.shouldRedraw = false
     if (this.overlayElement) {
-      let rect = this.view.getBoundingClientRect()
+      let rect = this.getView().getBoundingClientRect()
+      let parentRect = this.getView().parentElement.getBoundingClientRect()
       this.left = parseInt(this.getView().parentElement.style.left)
-      this.isVisible = rect.top < edRect.bottom && rect.top + 5 > edRect.top &&
-                       rect.left > edRect.left && rect.left + MIN_RESULT_WIDTH < edRect.right
-      this.newEdWidth = edRect.width !== this.lastEdWidth
+      this.isVisible = parentRect.top - 1 < edRect.bottom && rect.top + 1 > edRect.top &&
+                       rect.left > edRect.left
+      this.shouldRedraw = true
     }
   }
 
   // only write to the DOM
-  updateWidth (edRect) {
-    if (!!this.isVisible) {
-      this.view.style.visibility = 'visible'
+  updateWidth (edRect, winWidth) {
+    if (!!this.isVisible || this.model.expanded) {
+      this.getView().style.visibility = 'visible'
+      this.getView().style.pointerEvents = 'auto'
     } else {
-      this.view.style.visibility = 'hidden'
+      this.getView().style.visibility = 'hidden'
+      this.getView().style.pointerEvents = 'none'
     }
-    if ((this.isVisible && this.newEdWidth) || this.modelUpdated) {
-      let w = edRect.width + edRect.left - 40 - this.left
+    if (!!this.isVisible && (this.shouldRedraw || this.modelUpdated)) {
+      let w = edRect.right - RESULT_OFFSET - 10 - this.left
       if (w < MIN_RESULT_WIDTH) w = MIN_RESULT_WIDTH
+      if (edRect.width > 0 && this.left + RESULT_OFFSET + w > edRect.right) {
+        this.getView().style.left = (edRect.right - w - 10 - this.left) + 'px'
+        this.getView().style.opacity = 0.75
+      } else {
+        this.getView().style.left = RESULT_OFFSET + 'px'
+        this.getView().style.opacity = 1.0
+      }
+      this.getView().parentElement.style.maxWidth = (winWidth - RESULT_OFFSET - 10 - this.left) + 'px'
       this.getView().style.maxWidth = w + 'px'
-      this.lastEdWidth = edRect.width
       this.modelUpdated = false
     }
   }

@@ -6,6 +6,7 @@ etch = require 'etch'
 PaneItem = require './util/pane-item'
 Console = require './console/console'
 PlotPane = require './plots/pane'
+HTMLPane = require './plots/htmlpane'
 DocPane = require('./docs/docpane')
 InkTerminal = require('./console2/console')
 Workspace = require './workspace/workspace'
@@ -19,6 +20,7 @@ exportables =
   InkTerminal: once(=> InkTerminal)
   Workspace: once(=> Workspace)
   Linter: once(=> Linter)
+  HTMLPane: once(=> HTMLPane)
   Loading: once(=> require './util/loading')
   progress: once(=> require './util/progress')
   Tooltip: once(=> require './util/tooltip')
@@ -47,8 +49,13 @@ module.exports = Ink =
     # localStorage.setItem pkg.getCanDeferMainModuleRequireStorageKey(), exportables.false()
     mod.deactivate() for mod in [exportables.PaneItem(), exportables.Result(), exportables.InlineDoc(), exportables.Console(), exportables.PlotPane(), exportables.InkTerminal(), exportables.Linter()]
 
+  config: require('./config')
+
   consumeStatusBar: (bar) ->
     exportables.progress().consumeStatusBar bar
+
+  consumeRemoteFileOpener: (opener) ->
+    exportables.Opener().consumeRemoteFileOpener(opener)
 
   provide: ->
     obj =

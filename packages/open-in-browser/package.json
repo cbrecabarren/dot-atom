@@ -1,0 +1,47 @@
+{
+  "_from": "https://www.atom.io/api/packages/open-in-browser/versions/0.5.2/tarball",
+  "_id": "open-in-browser@0.5.2",
+  "_inBundle": false,
+  "_integrity": "sha512-JC15x5Pp35vhGFa2JXQdHgBCfYmgg1PPCVr9SOjV8LdCqyHM/sTfepnsSPRr7nrXP2dgQ1EV1kqCqaxI5iym/g==",
+  "_location": "/open-in-browser",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "remote",
+    "raw": "https://www.atom.io/api/packages/open-in-browser/versions/0.5.2/tarball",
+    "rawSpec": "https://www.atom.io/api/packages/open-in-browser/versions/0.5.2/tarball",
+    "saveSpec": "https://www.atom.io/api/packages/open-in-browser/versions/0.5.2/tarball",
+    "fetchSpec": "https://www.atom.io/api/packages/open-in-browser/versions/0.5.2/tarball"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://www.atom.io/api/packages/open-in-browser/versions/0.5.2/tarball",
+  "_shasum": "19bd4a1585ce989c3a3d69664bef3105d23c2eff",
+  "_spec": "https://www.atom.io/api/packages/open-in-browser/versions/0.5.2/tarball",
+  "_where": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-119010-16595-19427wr.mtks",
+  "bugs": {
+    "url": "https://github.com/magbicaleman/open-in-browser/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "opn": "^4.0.2"
+  },
+  "deprecated": false,
+  "description": "Simple Package to open file in default application",
+  "devDependencies": {
+    "coffeelint": "^1.15.0"
+  },
+  "engines": {
+    "atom": ">0.50.0"
+  },
+  "homepage": "https://github.com/magbicaleman/open-in-browser#readme",
+  "license": "MIT",
+  "main": "./lib/open-in-browser",
+  "name": "open-in-browser",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/magbicaleman/open-in-browser.git"
+  },
+  "version": "0.5.2"
+}

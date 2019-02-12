@@ -35,13 +35,20 @@ class TerminalElement extends HTMLElement {
     }))
 
     this.subs.add(atom.themes.onDidChangeActiveThemes(() => {
-      // make sure themes are applied
-      setTimeout(() => this.themeTerminal(), 100)
+      setTimeout(() => this.themeTerminal(), 0)
     }))
 
-    this.resizer.listenTo(this, debounce(() => this.resize(), 300))
+    this.subs.add(atom.config.observe('ink.terminal', (val) => {
+      this.ansiColors = val
+      this.themeTerminal()
+    }))
+
+    this.resizer.listenTo(this, debounce(() => this.resize(), 100))
 
     this.themeTerminal()
+    this.initMouseHandling()
+
+    this.model.searchui.attach(this)
 
     return this
   }
@@ -57,25 +64,40 @@ class TerminalElement extends HTMLElement {
   }
 
   resize () {
-    this.model.terminal.fit()
+    this.model.resize()
+  }
+
+  initMouseHandling () {
+    let isMouseOver = false
+
+    this.addEventListener('mouseover', e => {
+      isMouseOver = true
+    })
+
+    this.addEventListener('mouseout', e => {
+      isMouseOver = false
+    })
+
+    this.addEventListener('paste', e => {
+      if (!isMouseOver) {
+        e.preventDefault()
+        e.stopImmediatePropagation()
+      }
+    }, true)
   }
 
   themeTerminal () {
     let cs = window.getComputedStyle(this)
+    if (!cs['backgroundColor']) {
+      setTimeout(() => this.themeTerminal(), 100)
+      return
+    }
     let isDarkTheme = chroma(cs['backgroundColor']).luminance() < 0.5
     let bg = rgb2hex(cs['backgroundColor'])
     let fg = rgb2hex(cs['color'])
-
-    let black = chroma('#2e3436')
-    let red = chroma('#cc0000')
-    let green = chroma('#4e9a06')
-    let yellow = chroma('#c4a000')
-    let blue = chroma('#3465a4')
-    let magenta = chroma('#75507b')
-    let cyan = chroma('#06989a')
-    let white = chroma('#d3d7cf')
-
     let selection = chroma(fg).alpha(0.2)
+
+    let modifier = isDarkTheme ? 'dark' : 'light'
 
     this.model.terminal.setOption('theme', {
       'background': bg,
@@ -84,23 +106,23 @@ class TerminalElement extends HTMLElement {
       'cursor': fg,
       'cursorAccent': bg,
 
-      'black': black.hex(),
-      'red': red.hex(),
-      'green': green.hex(),
-      'yellow': yellow.hex(),
-      'blue': blue.hex(),
-      'magenta': magenta.hex(),
-      'cyan': cyan.hex(),
-      'white': white.hex(),
+      'black': this.ansiColors['ansiBlack'][modifier].toHexString(),
+      'red': this.ansiColors['ansiRed'][modifier].toHexString(),
+      'green': this.ansiColors['ansiGreen'][modifier].toHexString(),
+      'yellow': this.ansiColors['ansiYellow'][modifier].toHexString(),
+      'blue': this.ansiColors['ansiBlue'][modifier].toHexString(),
+      'magenta': this.ansiColors['ansiMagenta'][modifier].toHexString(),
+      'cyan': this.ansiColors['ansiCyan'][modifier].toHexString(),
+      'white': this.ansiColors['ansiWhite'][modifier].toHexString(),
 
-      'brightBlack': black.brighten(isDarkTheme ? 1 : 0.5).hex(),
-      'brightRed': red.brighten(isDarkTheme ? 1 : 0.5).hex(),
-      'brightGreen': green.brighten(isDarkTheme ? 1 : 0.5).hex(),
-      'brightYellow': yellow.brighten(isDarkTheme ? 1 : 0.5).hex(),
-      'brightBlue': blue.brighten(isDarkTheme ? 1 : 0.5).hex(),
-      'brightMagenta': magenta.brighten(isDarkTheme ? 1 : 0.5).hex(),
-      'brightCyan': cyan.brighten(isDarkTheme ? 1 : 0.5).hex(),
-      'brightWhite': white.brighten(isDarkTheme ? 1 : 0.5).hex(),
+      'brightBlack': this.ansiColors['ansiBrightBlack'][modifier].toHexString(),
+      'brightRed': this.ansiColors['ansiBrightRed'][modifier].toHexString(),
+      'brightGreen': this.ansiColors['ansiBrightGreen'][modifier].toHexString(),
+      'brightYellow': this.ansiColors['ansiBrightYellow'][modifier].toHexString(),
+      'brightBlue': this.ansiColors['ansiBrightBlue'][modifier].toHexString(),
+      'brightMagenta': this.ansiColors['ansiBrightMagenta'][modifier].toHexString(),
+      'brightCyan': this.ansiColors['ansiBrightCyan'][modifier].toHexString(),
+      'brightWhite': this.ansiColors['ansiBrightWhite'][modifier].toHexString(),
     })
 
     this.resize()

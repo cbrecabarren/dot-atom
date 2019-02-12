@@ -1,46 +1,32 @@
 {
-  "_args": [
-    [
-      {
-        "raw": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-118720-86083-13sfxix.74ux22zkt9/package.tgz",
-        "scope": null,
-        "escapedName": null,
-        "name": null,
-        "rawSpec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-118720-86083-13sfxix.74ux22zkt9/package.tgz",
-        "spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-118720-86083-13sfxix.74ux22zkt9/package.tgz",
-        "type": "local"
-      },
-      "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-118720-86083-v0a98c.9081xde7b9"
-    ]
-  ],
-  "_from": "../d-118720-86083-13sfxix.74ux22zkt9/package.tgz",
-  "_id": "markdown-preview-plus@3.4.0",
-  "_inCache": true,
+  "_from": "https://www.atom.io/api/packages/markdown-preview-plus/versions/3.7.1/tarball",
+  "_id": "markdown-preview-plus@3.7.1",
+  "_inBundle": false,
+  "_integrity": "sha512-8ysYgG4dJVO2MPMtmN+BYAjFIVjIPEuBcNa5ZSJfHyLn79L7CmZl1MBXahMZp3mqGSpMRGzV4O6HYpwiSRZk5Q==",
   "_location": "/markdown-preview-plus",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-118720-86083-13sfxix.74ux22zkt9/package.tgz",
-    "scope": null,
-    "escapedName": null,
-    "name": null,
-    "rawSpec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-118720-86083-13sfxix.74ux22zkt9/package.tgz",
-    "spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-118720-86083-13sfxix.74ux22zkt9/package.tgz",
-    "type": "local"
+    "type": "remote",
+    "raw": "https://www.atom.io/api/packages/markdown-preview-plus/versions/3.7.1/tarball",
+    "rawSpec": "https://www.atom.io/api/packages/markdown-preview-plus/versions/3.7.1/tarball",
+    "saveSpec": "https://www.atom.io/api/packages/markdown-preview-plus/versions/3.7.1/tarball",
+    "fetchSpec": "https://www.atom.io/api/packages/markdown-preview-plus/versions/3.7.1/tarball"
   },
   "_requiredBy": [
-    "#USER"
+    "#USER",
+    "/"
   ],
-  "_resolved": "file:../d-118720-86083-13sfxix.74ux22zkt9/package.tgz",
-  "_shasum": "62e0375bce2b03c4a24873da55c3d3e8ca62ec8c",
-  "_shrinkwrap": null,
-  "_spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-118720-86083-13sfxix.74ux22zkt9/package.tgz",
-  "_where": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-118720-86083-v0a98c.9081xde7b9",
+  "_resolved": "https://www.atom.io/api/packages/markdown-preview-plus/versions/3.7.1/tarball",
+  "_shasum": "8800f52b4c99d425a354a01c917b8c6acf09a33b",
+  "_spec": "https://www.atom.io/api/packages/markdown-preview-plus/versions/3.7.1/tarball",
+  "_where": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-119112-10012-7r70sv.ioiru",
   "atomTestRunner": "./node_modules/atom-ts-spec-runner/runner.js",
   "bugs": {
     "url": "https://github.com/atom-community/markdown-preview-plus/issues"
   },
+  "bundleDependencies": false,
   "dependencies": {
-    "atom-highlight": "^0.4.1",
+    "atom-select-list": "^0.7.2",
     "file-uri-to-path": "^1.0.0",
     "lodash": "^4.17.10",
     "markdown-it": "^8.4.2",
@@ -54,6 +40,7 @@
     "season": "^6.0",
     "twemoji": "^11.0.1"
   },
+  "deprecated": false,
   "description": "Markdown Preview + Community Features",
   "deserializers": {
     "markdown-preview-plus/MarkdownPreviewView": "createMarkdownPreviewView"
@@ -66,13 +53,13 @@
     "@types/markdown-it": "0.0.5",
     "@types/mathjax": "0.0.34",
     "@types/mocha": "^5.2.5",
-    "@types/node": "^8.10.26",
+    "@types/node": "^8.10.29",
     "@types/sinon-chai": "^3.2.0",
     "@types/temp": "^0.8.32",
     "atom-haskell-tslint-rules": "^0.2.2",
     "atom-ts-spec-runner": "^1.1.1",
     "chai": "^4.1.2",
-    "electron": "~2.0",
+    "electron": "^2.0.8",
     "fs-extra": "^7.0.0",
     "jasmine-tagged": "^1.1.4",
     "markdown-it-testgen": "^0.1.4",
@@ -82,7 +69,7 @@
     "sinon-chai": "^3.2.0",
     "temp": "^0.8.3",
     "tslint": "^5.11.0",
-    "typescript": "^3.0.1"
+    "typescript": "^3.0.3"
   },
   "engines": {
     "atom": ">=1.28.0 <2.0.0"
@@ -98,9 +85,6 @@
   "license": "MIT",
   "main": "./lib/main",
   "name": "markdown-preview-plus",
-  "optionalDependencies": {},
-  "readme": "# Markdown Preview Plus (MPP)\n\n[![appveyor](https://img.shields.io/appveyor/ci/lierdakil/markdown-preview-plus/master.svg?label=appveyor)](https://ci.appveyor.com/project/lierdakil/markdown-preview-plus/branch/master)\n[![travis](https://img.shields.io/travis/atom-community/markdown-preview-plus/master.svg?label=travis)](https://travis-ci.org/atom-community/markdown-preview-plus)\n![apm version](https://img.shields.io/apm/v/markdown-preview-plus.svg)\n![apm\ndownloads](https://img.shields.io/apm/dm/markdown-preview-plus.svg)\n[![dependency status](https://david-dm.org/atom-community/markdown-preview-plus/status.svg)](https://david-dm.org/atom-community/markdown-preview-plus)\n\nMarkdown Preview Plus (MPP) is a fork of [Markdown\nPreview](https://github.com/atom/markdown-preview) that provides a\nreal-time preview of markdown documents.\n\nShould you have any problems while installing or using MPP please open\nup a [new\nissue](https://github.com/atom-community/markdown-preview-plus/issues).\n\n![MPP](https://raw.githubusercontent.com/atom-community/markdown-preview-plus/master/imgs/mpp-full-res-invert.png)\n\n## Features\n\nWe also have a more detailed description of\n[features](https://github.com/atom-community/markdown-preview-plus/blob/master/docs/features.md).\n\n-   Quickly open a preview of any markdown with `ctrl-shift-m`\n-   Math rendering with persistent macro support, toggled with\n    `ctrl-shift-x`\n-   Optionally use pandoc with citation support\n-   Live reload while editing\n-   On demand synchronization\n-   And many more...\n\n## Installation\n\nLong instructions can be found [here](https://github.com/atom-community/markdown-preview-plus/blob/master/docs/installation.md). In short\nsteps:\n\n1.  Search for and install `markdown-preview-plus` in Atom's Settings\n    view.\n2.  Search for and disable the built-in package `markdown-preview`.\n3.  (Optional) Install and enable [Pandoc](https://pandoc.org).\n\n## Usage\n\nPlease see [options](https://github.com/atom-community/markdown-preview-plus/blob/master/docs/options.md) for further details on configuring\nMPP and [math](https://github.com/atom-community/markdown-preview-plus/blob/master/docs/math.md) for more details on math rendering. For\nbasic usage:\n\n-   Toggle Preview: `ctrl-shift-m`\n-   Toggle Math Rendering: `ctrl-shift-x`\n\n## Contributing\n\nSee [CONTRIBUTING.md](https://github.com/atom-community/markdown-preview-plus/blob/master/CONTRIBUTING.md).\n\nAlso of interest might be [issues marked as \"help wanted\"](https://github.com/atom-community/markdown-preview-plus/labels/help%20wanted)\n\n## License\n\nMarkdown Preview Plus (MPP) is released under the [MIT\nlicense](https://github.com/atom-community/markdown-preview-plus/blob/master/LICENSE.md).\n",
-  "readmeFilename": "README.md",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/atom-community/markdown-preview-plus.git"
@@ -113,5 +97,5 @@
     "test": "npm run typecheck && npm run lint && npm run prettier-check",
     "typecheck": "tsc --noEmit -p . && tsc --noEmit -p src-client && tsc --noEmit -p spec"
   },
-  "version": "3.4.0"
+  "version": "3.7.1"
 }

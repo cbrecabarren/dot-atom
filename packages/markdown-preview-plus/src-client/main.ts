@@ -4,6 +4,24 @@ import { processHTMLString, jaxTeXConfig, rerenderMath } from './mathjax-helper'
 import * as util from './util'
 import { getMedia } from '../src/util-common'
 
+window.addEventListener('error', (e) => {
+  const err = e.error as Error
+  ipcRenderer.sendToHost<'uncaught-error'>('uncaught-error', {
+    message: err.message,
+    name: err.name,
+    stack: err.stack,
+  })
+})
+
+window.addEventListener('unhandledrejection', (evt) => {
+  const err = (evt as any).reason as Error
+  ipcRenderer.sendToHost<'uncaught-error'>('uncaught-error', {
+    message: err.message,
+    name: err.name,
+    stack: err.stack,
+  })
+})
+
 function mkResPromise<T>(): ResolvablePromise<T> {
   let resFn: (value?: T | PromiseLike<T> | undefined) => void
   const p = new Promise<T>((resolve) => (resFn = resolve)) as ResolvablePromise<
@@ -98,12 +116,15 @@ ipcRenderer.on<'update-images'>('update-images', (_event, { oldsrc, v }) => {
   for (const img of Array.from(imgs)) {
     let ovs: string | undefined
     let ov: number | undefined
-    let src = img.getAttribute('src')!
+    let attrName: 'href' | 'src'
+    if (img.tagName === 'LINK') attrName = 'href'
+    else attrName = 'src'
+    let src = img.getAttribute(attrName)!
     const match = src.match(/^(.*)\?v=(\d+)$/)
     if (match) [, src, ovs] = match
     if (src === oldsrc) {
       if (ovs !== undefined) ov = parseInt(ovs, 10)
-      if (v !== ov) img.src = v ? `${src}?v=${v}` : `${src}`
+      if (v !== ov) img[attrName] = v ? `${src}?v=${v}` : `${src}`
     }
   }
 })
@@ -128,16 +149,6 @@ ipcRenderer.on<'sync'>('sync', (_event, { line, flash }) => {
   if (flash) {
     element.classList.add('flash')
     setTimeout(() => element!.classList.remove('flash'), 1000)
-  }
-})
-
-ipcRenderer.on<'use-github-style'>('use-github-style', (_event, { value }) => {
-  const elem = document.querySelector('markdown-preview-plus-view')
-  if (!elem) throw new Error(`Can't find MPP-view`)
-  if (value) {
-    elem.setAttribute('data-use-github-style', '')
-  } else {
-    elem.removeAttribute('data-use-github-style')
   }
 })
 

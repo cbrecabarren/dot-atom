@@ -20,11 +20,13 @@ autocomplete-suggestion-list.select-list.popover-list {
 
   pre {
     margin-bottom: 0.5em;
+    font-size: inherit;
     font-family: var(--editor-font-family);
   }
 
   code {
     font-family: var(--editor-font-family);
+    font-size: inherit;
   }
 
   hr {
@@ -51,7 +53,7 @@ autocomplete-suggestion-list.select-list.popover-list {
 
 
 .ink-result-toolbar {
-  right: 0;
+  left: 0;
   transition: visibility 0s linear 0.2s, opacity 0.1s linear;
   font-family: 'Octicons Regular';
   font-size: 8px!important;
@@ -66,7 +68,7 @@ autocomplete-suggestion-list.select-list.popover-list {
   pointer-events: none;
 
   transform: scale(0.75);
-  transform-origin: right;
+  transform-origin: left;
 
   .btn::before {
     line-height: 1.5em;
@@ -80,7 +82,7 @@ autocomplete-suggestion-list.select-list.popover-list {
     display: none!important;
   }
   > .btn-group {
-    float: right;
+    float: left;
     pointer-events: auto;
   }
 }
@@ -92,6 +94,7 @@ autocomplete-suggestion-list.select-list.popover-list {
   pointer-events: auto;
 
   &:hover {
+    opacity: 1 !important;
     .ink-result-toolbar {
       opacity: 0.5;
       visibility: visible;
@@ -103,10 +106,18 @@ autocomplete-suggestion-list.select-list.popover-list {
 .ink-overlay {
   pointer-events: none;
   background-color: rgba(0, 0, 0, 0);
+
+  &:hover {
+    z-index: 5!important;
+    .ink-result-container {
+      max-width: none!important;
+    }
+  }
 }
 
 .ink-underlay {
   width: 100%;
+  pointer-events: none;
 
   .ink-result-container {
     top: 0!important;
@@ -216,11 +227,11 @@ atom-text-editor {
 
   border-left: 2px solid @background-color-info;
   border-right: 2px solid contrast(@syntax-background-color,
-                                   darken(@syntax-background-color, 4%),
-                                   lighten(@syntax-background-color, 4%));
+                                   darken(@syntax-background-color, 8%),
+                                   lighten(@syntax-background-color, 8%));
 
   padding: 0px 0.5em 0px 0.5em;
-  transition: all 0.2s;
+  transition: all 0.2s, visibility 0s;
   opacity: 1;
   cursor: default;
   user-select: auto;
@@ -378,6 +389,7 @@ atom-text-editor {
   .icon {
     text-align: center;
     transition: all 0.1s ease-out;
+    transition: visibility 0s;
     &.open {
       transform: rotate(0.25turn);
     }

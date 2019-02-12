@@ -11,8 +11,11 @@
     disabledPackages: [
       "metrics"
       "spell-check"
-      "pigments"
       "markdown-preview"
+      "pigments"
+    ]
+    packagesWithKeymapsDisabled: [
+      "snippets"
     ]
     telemetryConsent: "no"
     themes: [

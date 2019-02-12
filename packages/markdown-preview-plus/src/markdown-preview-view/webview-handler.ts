@@ -5,6 +5,7 @@ import fileUriToPath = require('file-uri-to-path')
 
 import { handlePromise, atomConfig } from '../util'
 import { RequestReplyMap, ChannelMap } from '../../src-client/ipc'
+import { getPreviewStyles } from './util'
 
 export type ReplyCallbackStruct<
   T extends keyof RequestReplyMap = keyof RequestReplyMap
@@ -50,6 +51,21 @@ export class WebviewHandler {
           case 'did-scroll-preview':
             this.emitter.emit('did-scroll-preview', e.args[0])
             break
+          case 'uncaught-error': {
+            const err = e.args[0]
+            const newErr = new Error()
+            atom.notifications.addFatalError(
+              `Uncaught error ${
+                err.name
+              } in markdown-preview-plus webview client`,
+              {
+                dismissable: true,
+                stack: newErr.stack,
+                detail: `${err.message}\n\nstack:\n${err.stack}`,
+              },
+            )
+            break
+          }
           // replies
           case 'request-reply': {
             const { id, request, result } = e.args[0]
@@ -64,7 +80,11 @@ export class WebviewHandler {
       },
     )
     this._element.addEventListener('will-navigate', async (e) => {
-      if (e.url.startsWith('file://')) {
+      const exts = atomConfig().previewConfig.shellOpenFileExtensions
+      const forceOpenExternal = exts.some((ext) =>
+        e.url.toLowerCase().endsWith(`.${ext.toLowerCase()}`),
+      )
+      if (e.url.startsWith('file://') && !forceOpenExternal) {
         handlePromise(atom.workspace.open(fileUriToPath(e.url)))
       } else {
         shell.openExternal(e.url)
@@ -121,10 +141,6 @@ export class WebviewHandler {
     [line: number]: { tag: string; index: number }[]
   }) {
     this._element.send<'set-source-map'>('set-source-map', { map })
-  }
-
-  public setUseGitHubStyle(value: boolean) {
-    this._element.send<'use-github-style'>('use-github-style', { value })
   }
 
   public setBasePath(path?: string) {
@@ -244,6 +260,10 @@ export class WebviewHandler {
     return this.runRequest('get-selection', {})
   }
 
+  public updateStyles() {
+    this._element.send<'style'>('style', { styles: getPreviewStyles(true) })
+  }
+
   protected async runRequest<T extends keyof RequestReplyMap>(
     request: T,
     args: { [K in Exclude<keyof ChannelMap[T], 'id'>]: ChannelMap[T][K] },
@@ -274,14 +294,6 @@ export class WebviewHandler {
 
   private async finishSaveToPDF(): Promise<void> {
     return this.runRequest('set-width', { width: undefined })
-  }
-
-  private updateStyles() {
-    const styles: string[] = []
-    for (const se of atom.styles.getStyleElements()) {
-      styles.push(se.innerHTML)
-    }
-    this._element.send<'style'>('style', { styles })
   }
 }
 

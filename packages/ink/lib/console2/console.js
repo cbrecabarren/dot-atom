@@ -8,18 +8,21 @@ import { Terminal } from 'xterm'
 import * as fit from 'xterm/lib/addons/fit/fit'
 import * as webLinks from 'xterm/lib/addons/webLinks/webLinks'
 import * as winptyCompat from 'xterm/lib/addons/winptyCompat/winptyCompat'
+import * as search from 'xterm/lib/addons/search/search'
 import TerminalElement from './view'
 import PaneItem from '../util/pane-item'
 import ResizeDetector from 'element-resize-detector'
 import { debounce, throttle } from 'underscore-plus'
 import { closest } from './helpers'
 import { openExternal } from 'shell'
+import SearchUI from './searchui'
 
 let getTerminal = el => closest(el, 'ink-terminal').getModel()
 
 Terminal.applyAddon(fit)
 Terminal.applyAddon(webLinks)
 Terminal.applyAddon(winptyCompat)
+Terminal.applyAddon(search)
 
 var subs
 
@@ -36,15 +39,35 @@ export default class InkTerminal extends PaneItem {
         let term = getTerminal(target)
         if (term != undefined) {
           term.paste(process.platform != 'win32')
+        }},
+      'ink-terminal:show-search': ({target}) => {
+        let term = getTerminal(target)
+        if (term != undefined) {
+          term.searchui.show()
+        }},
+      'ink-terminal:find-next': ({target}) => {
+        let term = getTerminal(target)
+        if (term != undefined) {
+          term.searchui.find(true)
+        }},
+      'ink-terminal:find-previous': ({target}) => {
+        let term = getTerminal(target)
+        if (term != undefined) {
+          term.searchui.find(false)
+        }},
+      'ink-terminal:close-search': ({target}) => {
+        let term = getTerminal(target)
+        if (term != undefined) {
+          term.searchui.hide()
         }}
     }))
 
-    subs.add(atom.workspace.onDidStopChangingActivePaneItem((item) => {
+    subs.add(atom.workspace.onDidChangeActivePaneItem((item) => {
       if (item instanceof InkTerminal) {
         item.view.initialize(item)
         item.terminal.focus()
         if (item.ty) {
-          item.tyResize(item.terminal.proposeGeometry())
+          item.resize()
         }
       }
     }))
@@ -55,7 +78,6 @@ export default class InkTerminal extends PaneItem {
   }
 
   name = 'InkTerminal'
-  title = 'Terminal'
 
   constructor (opts) {
     super()
@@ -71,6 +93,8 @@ export default class InkTerminal extends PaneItem {
 
     this.terminal = new Terminal(opts)
     this.emitter = new Emitter()
+
+    this.setTitle('Terminal')
 
     webLinks.webLinksInit(this.terminal, (ev, uri) => openExternal(uri))
     this.terminal.winptyCompatInit()
@@ -91,6 +115,8 @@ export default class InkTerminal extends PaneItem {
 
     this.view = new TerminalElement
 
+    this.searchui = new SearchUI(this.terminal)
+
     etch.initialize(this)
     etch.update(this).then(() => {
       this.view.initialize(this)
@@ -102,23 +128,6 @@ export default class InkTerminal extends PaneItem {
   set class (name) {
     this.classname = name
     this.view.className = name
-  }
-
-  setTitle (t, force) {
-    if (force == undefined) {
-      if (!this.forced) {
-        this.title = t
-        this.emitter.emit('change-title', t)
-      }
-    } else {
-      this.forced = force
-      this.title = t
-      this.emitter.emit('change-title', t)
-    }
-  }
-
-  onDidChangeTitle (f) {
-    return this.emitter.on('change-title', f)
   }
 
   cursorPosition () {
@@ -139,7 +148,7 @@ export default class InkTerminal extends PaneItem {
   onAttached () {
     this.view.initialize(this)
     // force resize
-    if (this.ty) this.tyResize(this.terminal.proposeGeometry())
+    if (this.ty) this.resize()
   }
 
   attachCustomKeyEventHandler (f, keepDefault = true) {
@@ -171,10 +180,10 @@ export default class InkTerminal extends PaneItem {
 
     this.terminal.on('data', this.tyWrite)
     this.terminal.on('resize', this.tyResize)
-    this.ty.on('data', (data) => this.terminal.write(data))
+    this.ty.on('data', (data) => this.terminal.write(data.toString()))
 
     if (this.element.parentElement) {
-      this.tyResize(this.terminal.proposeGeometry())
+      this.resize()
     }
 
     if (clear) this.clear()
@@ -194,6 +203,13 @@ export default class InkTerminal extends PaneItem {
     }
 
     this.ty.write(text)
+  }
+
+  resize () {
+    let {cols, rows} = this.terminal.proposeGeometry()
+    // resize twice with different sizes to actually force a resize:
+    this.terminal.resize(cols - 2, rows)
+    this.terminal.resize(cols - 1, rows)
   }
 
   clear (hidePrompt = false) {
@@ -224,16 +240,12 @@ export default class InkTerminal extends PaneItem {
     bracketed && this.ty.write('\x1b[201~') // disable bracketed paste mode
   }
 
-  show (view) {
+  show () {
     this.terminal.focus()
   }
 
   write (str) {
     this.terminal.write(str)
-  }
-
-  getTitle() {
-    return this.title
   }
 
   getIconName() {

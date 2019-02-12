@@ -75,8 +75,14 @@ export class Progress extends Etch {
     }
 
     if (this.props.message) {
-      if (this.tt) this.tt.dispose()
-      this.tt = atom.tooltips.add(this.element, {title: this.props.message})
+      if (!this.tt) {
+        this.tt = atom.tooltips.add(this.element, {title: this.props.message})
+      } else {
+        for (let tt of atom.tooltips.findTooltips(this.element)) {
+          tt.options.title = this.props.message
+          tt.setContent()
+        }
+      }
     }
   }
 
@@ -129,8 +135,9 @@ export class Badge extends Etch {
 export class Button extends Etch {
   render() {
     let iconclass = this.props.icon ? ` icon icon-${this.props.icon}` : '';
+    let classname = this.props.className || ''
     return <Tip alt={this.props.alt}>
-      <button className={'btn' + iconclass} disabled={this.props.disabled} onclick={this.props.onclick}>{
+      <button className={'btn' + iconclass + ' ' + classname} disabled={this.props.disabled} onclick={this.props.onclick}>{
         this.children
       }</button>
     </Tip>;

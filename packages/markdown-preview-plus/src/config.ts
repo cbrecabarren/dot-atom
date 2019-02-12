@@ -6,6 +6,8 @@ export interface IConfig {
     description?: string
     properties?: IConfig
     default?: any
+    minimum?: any
+    maximum?: any
     enum?: any[]
     items?: {
       type: string
@@ -46,6 +48,37 @@ export const config: IConfig = {
     type: 'boolean',
     default: false,
     order: 2,
+  },
+  syntaxThemeName: {
+    title: 'Syntax theme for code blocks',
+    description:
+      'If not empty, will try to use the given syntax theme for code blocks in preview',
+    type: 'string',
+    default: '',
+    order: 2.5,
+  },
+  importPackageStyles: {
+    title: 'Packages that can affect preview rendering',
+    description:
+      'A list of Atom package names that can affect preview style, comma-separated. ' +
+      'A special value of `*` (star) will import all Atom styles into the preview, ' +
+      'use with care. This does not affect exported HTML',
+    type: 'array',
+    items: {
+      type: 'string',
+    },
+    default: ['fonts'],
+    order: 2.6,
+  },
+  codeTabWidth: {
+    title: 'Tab width for code blocks',
+    description:
+      'How to render tab character in code blocks;' +
+      ' 0 means use Atom global setting',
+    type: 'integer',
+    default: 0,
+    minimum: 0,
+    order: 2.7,
   },
   renderer: {
     type: 'string',
@@ -98,6 +131,40 @@ export const config: IConfig = {
         type: 'boolean',
         default: false,
         order: 27,
+      },
+      shellOpenFileExtensions: {
+        title: 'Always open links to these file types externally',
+        description:
+          'This is a comma-separated list of file name extensions that ' +
+          'should always be opened with an external program. ' +
+          'For example, if you want to always open PDF files (presumably named `something.pdf`) ' +
+          'in system PDF viewer, add `pdf` here.',
+        type: 'array',
+        default: [
+          'odt',
+          'doc',
+          'docx',
+          'ods',
+          'xls',
+          'xlsx',
+          'odp',
+          'ppt',
+          'pptx',
+          'zip',
+          'rar',
+          '7z',
+          'gz',
+          'xz',
+          'bz2',
+          'tar',
+          'tgz',
+          'txz',
+          'tbz2',
+        ],
+        order: 28,
+        items: {
+          type: 'string',
+        },
       },
     },
   },
@@ -468,6 +535,9 @@ declare module 'atom' {
     'markdown-preview-plus.grammars': string[]
     'markdown-preview-plus.extensions': string[]
     'markdown-preview-plus.useGitHubStyle': boolean
+    'markdown-preview-plus.syntaxThemeName': string
+    'markdown-preview-plus.importPackageStyles': string[]
+    'markdown-preview-plus.codeTabWidth': number
     'markdown-preview-plus.renderer': 'markdown-it' | 'pandoc'
     'markdown-preview-plus.richClipboard': boolean
     'markdown-preview-plus.previewConfig.liveUpdate': boolean
@@ -482,12 +552,14 @@ declare module 'atom' {
       | 'center'
     'markdown-preview-plus.previewConfig.closePreviewWithEditor': boolean
     'markdown-preview-plus.previewConfig.activatePreviewWithEditor': boolean
+    'markdown-preview-plus.previewConfig.shellOpenFileExtensions': string[]
     'markdown-preview-plus.previewConfig': {
       liveUpdate: boolean
       previewSplitPaneDir: 'down' | 'right' | 'none'
       previewDock: 'left' | 'right' | 'bottom' | 'center'
       closePreviewWithEditor: boolean
       activatePreviewWithEditor: boolean
+      shellOpenFileExtensions: string[]
     }
     'markdown-preview-plus.saveConfig.mediaOnSaveAsHTMLBehaviour':
       | 'relativized'
@@ -613,6 +685,9 @@ declare module 'atom' {
       grammars: string[]
       extensions: string[]
       useGitHubStyle: boolean
+      syntaxThemeName: string
+      importPackageStyles: string[]
+      codeTabWidth: number
       renderer: 'markdown-it' | 'pandoc'
       richClipboard: boolean
       'previewConfig.liveUpdate': boolean
@@ -620,12 +695,14 @@ declare module 'atom' {
       'previewConfig.previewDock': 'left' | 'right' | 'bottom' | 'center'
       'previewConfig.closePreviewWithEditor': boolean
       'previewConfig.activatePreviewWithEditor': boolean
+      'previewConfig.shellOpenFileExtensions': string[]
       previewConfig: {
         liveUpdate: boolean
         previewSplitPaneDir: 'down' | 'right' | 'none'
         previewDock: 'left' | 'right' | 'bottom' | 'center'
         closePreviewWithEditor: boolean
         activatePreviewWithEditor: boolean
+        shellOpenFileExtensions: string[]
       }
       'saveConfig.mediaOnSaveAsHTMLBehaviour':
         | 'relativized'
