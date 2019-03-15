@@ -31,7 +31,7 @@
     atomicSoftTabs: false
     autoIndent: false
     fontFamily: "Monaco"
-    fontSize: 12
+    fontSize: 10
     invisibles: {}
     scrollPastEnd: true
     showIndentGuide: true
