@@ -1,0 +1,41 @@
+{
+  "_from": "https://www.atom.io/api/packages/language-systemd/versions/0.1.1/tarball",
+  "_id": "language-systemd@0.1.1",
+  "_inBundle": false,
+  "_integrity": "sha512-ygowHk8GFwiU7b1CK8WDAbcS5dm9zpjixkBFHXzcsWugt3nGUdVipn0cpEvH3sq4SetHvMy2dA3Of/nPhF4FSw==",
+  "_location": "/language-systemd",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "remote",
+    "raw": "https://www.atom.io/api/packages/language-systemd/versions/0.1.1/tarball",
+    "rawSpec": "https://www.atom.io/api/packages/language-systemd/versions/0.1.1/tarball",
+    "saveSpec": "https://www.atom.io/api/packages/language-systemd/versions/0.1.1/tarball",
+    "fetchSpec": "https://www.atom.io/api/packages/language-systemd/versions/0.1.1/tarball"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://www.atom.io/api/packages/language-systemd/versions/0.1.1/tarball",
+  "_shasum": "3a03b6be778beb5b687d6aca15b596945efd572e",
+  "_spec": "https://www.atom.io/api/packages/language-systemd/versions/0.1.1/tarball",
+  "_where": "/tmp/apm-install-dir-119928-23098-1tgwooe.j0zn",
+  "bugs": {
+    "url": "https://github.com/arbourd/language-systemd/issues"
+  },
+  "bundleDependencies": false,
+  "deprecated": false,
+  "description": "Systemd configuration support in Atom",
+  "engines": {
+    "atom": "*",
+    "node": "*"
+  },
+  "homepage": "https://github.com/arbourd/language-systemd#readme",
+  "license": "MIT",
+  "name": "language-systemd",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arbourd/language-systemd.git"
+  },
+  "version": "0.1.1"
+}

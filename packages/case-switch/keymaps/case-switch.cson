@@ -1,0 +1,14 @@
+# Keybindings require three things to be fully defined: A selector that is
+# matched against the focused element, the keystroke and the command to
+# execute.
+#
+# Below is a basic keybinding which registers on all platforms by applying to
+# the root workspace element.
+
+# For more detailed documentation see
+# https://atom.io/docs/latest/advanced/keymaps
+'atom-workspace':
+  "alt-c ctrl-t": 'case-switch:toggle'
+  "alt-c ctrl-c": "case-switch:convert-to-camel-case"
+  "alt-c ctrl-s": "case-switch:convert-to-snake-case"
+  "alt-c ctrl-k": "case-switch:convert-to-kebab-case"

@@ -1,25 +1,25 @@
 {
-  "_from": "https://www.atom.io/api/packages/markdown-preview-plus/versions/3.7.1/tarball",
-  "_id": "markdown-preview-plus@3.7.1",
+  "_from": "https://www.atom.io/api/packages/markdown-preview-plus/versions/3.9.2/tarball",
+  "_id": "markdown-preview-plus@3.9.2",
   "_inBundle": false,
-  "_integrity": "sha512-8ysYgG4dJVO2MPMtmN+BYAjFIVjIPEuBcNa5ZSJfHyLn79L7CmZl1MBXahMZp3mqGSpMRGzV4O6HYpwiSRZk5Q==",
+  "_integrity": "sha512-kgmFEht38vACZmkfEgr7ZQUX1THW9BBtmkEOTCPxuMzL4k+UAheQNgy7X/F33cMuMKf4iVdgJcKBVFIJeoZNQw==",
   "_location": "/markdown-preview-plus",
   "_phantomChildren": {},
   "_requested": {
     "type": "remote",
-    "raw": "https://www.atom.io/api/packages/markdown-preview-plus/versions/3.7.1/tarball",
-    "rawSpec": "https://www.atom.io/api/packages/markdown-preview-plus/versions/3.7.1/tarball",
-    "saveSpec": "https://www.atom.io/api/packages/markdown-preview-plus/versions/3.7.1/tarball",
-    "fetchSpec": "https://www.atom.io/api/packages/markdown-preview-plus/versions/3.7.1/tarball"
+    "raw": "https://www.atom.io/api/packages/markdown-preview-plus/versions/3.9.2/tarball",
+    "rawSpec": "https://www.atom.io/api/packages/markdown-preview-plus/versions/3.9.2/tarball",
+    "saveSpec": "https://www.atom.io/api/packages/markdown-preview-plus/versions/3.9.2/tarball",
+    "fetchSpec": "https://www.atom.io/api/packages/markdown-preview-plus/versions/3.9.2/tarball"
   },
   "_requiredBy": [
     "#USER",
     "/"
   ],
-  "_resolved": "https://www.atom.io/api/packages/markdown-preview-plus/versions/3.7.1/tarball",
-  "_shasum": "8800f52b4c99d425a354a01c917b8c6acf09a33b",
-  "_spec": "https://www.atom.io/api/packages/markdown-preview-plus/versions/3.7.1/tarball",
-  "_where": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-119112-10012-7r70sv.ioiru",
+  "_resolved": "https://www.atom.io/api/packages/markdown-preview-plus/versions/3.9.2/tarball",
+  "_shasum": "0da0bcd61b96a857a0702f93c3e162831339796f",
+  "_spec": "https://www.atom.io/api/packages/markdown-preview-plus/versions/3.9.2/tarball",
+  "_where": "/tmp/apm-install-dir-119817-21486-o6u83t.c9fj",
   "atomTestRunner": "./node_modules/atom-ts-spec-runner/runner.js",
   "bugs": {
     "url": "https://github.com/atom-community/markdown-preview-plus/issues"
@@ -28,17 +28,19 @@
   "dependencies": {
     "atom-select-list": "^0.7.2",
     "file-uri-to-path": "^1.0.0",
-    "lodash": "^4.17.10",
-    "markdown-it": "^8.4.2",
+    "lodash": "^4.17.15",
+    "markdown-it": "^9.0.1",
+    "markdown-it-anchor": "^5.2.4",
     "markdown-it-emoji": "^1.4.0",
+    "markdown-it-footnote": "^3.0.2",
     "markdown-it-imsize": "^2.0.1",
     "markdown-it-lazy-headers": "^0.1.3",
-    "markdown-it-table-of-contents": "^0.4.3",
+    "markdown-it-table-of-contents": "^0.4.4",
     "markdown-it-task-lists": "^2.1.1",
     "mathjax": "https://github.com/atom-community/MathJax/archive/2.7.4-electron.0.1.0.tar.gz",
-    "morphdom": "^2.3.3",
+    "morphdom": "^2.5.4",
     "season": "^6.0",
-    "twemoji": "^11.0.1"
+    "twemoji": "^12.1.2"
   },
   "deprecated": false,
   "description": "Markdown Preview + Community Features",
@@ -46,30 +48,32 @@
     "markdown-preview-plus/MarkdownPreviewView": "createMarkdownPreviewView"
   },
   "devDependencies": {
-    "@types/atom": "^1.28.0",
-    "@types/chai": "^4.1.4",
-    "@types/fs-extra": "^5.0.4",
-    "@types/lodash": "^4.14.116",
-    "@types/markdown-it": "0.0.5",
-    "@types/mathjax": "0.0.34",
-    "@types/mocha": "^5.2.5",
-    "@types/node": "^8.10.29",
-    "@types/sinon-chai": "^3.2.0",
-    "@types/temp": "^0.8.32",
+    "@types/atom": "^1.36.1",
+    "@types/chai": "^4.1.7",
+    "@types/fs-extra": "^8.0.0",
+    "@types/lodash": "^4.14.136",
+    "@types/markdown-it": "0.0.8",
+    "@types/mathjax": "0.0.35",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^8.10.51",
+    "@types/sinon-chai": "^3.2.2",
+    "@types/temp": "^0.8.34",
     "atom-haskell-tslint-rules": "^0.2.2",
     "atom-ts-spec-runner": "^1.1.1",
-    "chai": "^4.1.2",
-    "electron": "^2.0.8",
-    "fs-extra": "^7.0.0",
+    "chai": "^4.2.0",
+    "electron": "^2.0.18",
+    "fs-extra": "^8.1.0",
     "jasmine-tagged": "^1.1.4",
-    "markdown-it-testgen": "^0.1.4",
-    "parcel-bundler": "^1.9.7",
-    "prettier": "^1.14.2",
-    "sinon": "^6.1.5",
-    "sinon-chai": "^3.2.0",
-    "temp": "^0.8.3",
-    "tslint": "^5.11.0",
-    "typescript": "^3.0.3"
+    "markdown-it-testgen": "^0.1.6",
+    "parcel-bundler": "^1.12.3",
+    "prettier": "^1.18.2",
+    "sinon": "^7.3.2",
+    "sinon-chai": "^3.3.0",
+    "temp": "^0.9.0",
+    "tslint": "^5.18.0",
+    "tslint-use-atom-disposables": "0.0.1",
+    "typescript": "^3.5.3",
+    "typescript-tslint-plugin": "0.5.4"
   },
   "engines": {
     "atom": ">=1.28.0 <2.0.0"
@@ -90,12 +94,12 @@
     "url": "git+https://github.com/atom-community/markdown-preview-plus.git"
   },
   "scripts": {
-    "build": "tsc -p . && node scripts/build-client.js",
-    "lint": "tslint --project . && tslint --project src-client && tslint --project spec",
+    "build": "tsc -p src && node scripts/build-client.js",
+    "lint": "tslint --project src && tslint --project src-client && tslint --project spec",
     "prettier": "prettier --write 'src/**/*.ts' 'src-client/**/*.ts' 'spec/**/*.ts'",
     "prettier-check": "prettier -l 'src/**/*.ts' 'src-client/**/*.ts' 'spec/**/*.ts'",
     "test": "npm run typecheck && npm run lint && npm run prettier-check",
-    "typecheck": "tsc --noEmit -p . && tsc --noEmit -p src-client && tsc --noEmit -p spec"
+    "typecheck": "tsc --noEmit -p src && tsc --noEmit -p src-client && tsc --noEmit -p spec"
   },
-  "version": "3.7.1"
+  "version": "3.9.2"
 }

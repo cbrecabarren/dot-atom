@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+set -e
+
+SCRIPT_NAME="live-sessions_run"
+
+echo "Inicia proceso: ${SCRIPT_NAME}"
+echo "Tiempo:" $(date)
+
+RESET_OFFSETS="NO"
+for i in "$@"
+do
+case $i in
+    --reset-offsets)
+    RESET_OFFSETS="YES"
+    shift
+    ;;
+esac
+done
+
+# Puerto de monitoreo
+JMX_PORT="10038"
+
+export JAVA_OPTS="-Dapp.config=conf/application.properties -Dapp.yahargulConfig=conf/yahargul.properties -Dlog4j.configurationFile=conf/logging.properties -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=${JMX_PORT} -Dcom.sun.management.jmxremote.local.only=true -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
+
+# Ruta hacia archivo de GeoIP para City
+export GEOIP2CITY_DB_PATH="/home/centos/geolocation/dbs/GeoIP2-City_20190305/GeoIP2-City.mmdb"
+
+# Ruta hacia archivo de GeoIP para ISP
+export GEOIP2ISP_DB_PATH="/home/centos/geolocation/dbs/GeoIP2-ISP_20190305/GeoIP2-ISP.mmdb"
+
+# Resetea offsets
+if [ "${RESET_OFFSETS}" == "YES" ]; then
+  echo "Reseteando los offsets hacia los últimos..."
+  kafka-consumer-groups --bootstrap-server 127.0.0.1:9092 --group mensis-play-sessions-LIVE --topic live-enriched --reset-offsets --to-latest --execute
+fi
+
+# Corre el procesamiento
+current/bin/mensis-play-sessions

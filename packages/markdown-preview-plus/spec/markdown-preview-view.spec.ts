@@ -20,9 +20,18 @@ import {
   activateMe,
   previewHTML,
   previewHeadHTML,
+  sinonPrivateSpy,
 } from './util'
 import { TextEditorElement, TextEditor } from 'atom'
 import { PlaceholderView } from '../lib/placeholder-view'
+
+declare module 'atom' {
+  interface AtomEnvironment {
+    applicationDelegate: {
+      showSaveDialog(options: {}, callback: Function): void
+    }
+  }
+}
 
 describe('MarkdownPreviewView', function() {
   let filePath: string
@@ -755,7 +764,7 @@ var x = 0;
       const stubs = []
       stubs.push(
         sinon
-          .stub((atom as any).applicationDelegate, 'showSaveDialog')
+          .stub(atom.applicationDelegate, 'showSaveDialog')
           .callsFake((_options, callback: Function) => {
             if (callback) callback(outputPath)
             return outputPath
@@ -842,7 +851,7 @@ var x = 0;
 <h1>Code Block</h1>
 <pre class="editor-colors lang-javascript"><span><span class="syntax--source syntax--js"><span class="syntax--keyword syntax--control">if</span> a <span class="syntax--keyword syntax--operator syntax--js">===</span> <span class="syntax--constant syntax--numeric">3</span> <span class="syntax--punctuation syntax--definition syntax--function syntax--body syntax--begin syntax--bracket syntax--curly">{</span></span></span>
 <span class=""><span class="syntax--source syntax--js"><span class="leading-whitespace">  </span>b <span class="syntax--keyword syntax--operator syntax--js">=</span> <span class="syntax--constant syntax--numeric">5</span></span></span>
-<span><span class="syntax--source syntax--js"><span class="syntax--punctuation syntax--definition syntax--function syntax--body syntax--end syntax--bracket syntax--curly">}</span></span></span></pre>
+<span class=""><span class="syntax--source syntax--js"><span class="syntax--punctuation syntax--definition syntax--function syntax--body syntax--end syntax--bracket syntax--curly">}</span></span></span></pre>
 <p>encoding → issue</p>
 `)
     }))
@@ -892,11 +901,14 @@ var x = 0;
       const editor = (await atom.workspace.open('nonexistent.md')) as TextEditor
       editor.setText(`![Some Image](img.png "title" =100x200)`)
       const pv = await createMarkdownPreviewViewEditor(editor)
+      console.log(await previewFragment(pv))
       const [height, width, title] = await pv.runJS<[number, number, string]>(
-        `{ let img = document.querySelector('img'); [img.height, img.width, img.title]; }`,
+        `{ let img = document.querySelector('img');
+          [img.getAttribute('height'), img.getAttribute('width'), img.getAttribute('title')];
+        }`,
       )
-      expect(width).to.equal(100)
-      expect(height).to.equal(200)
+      expect(width).to.equal('100')
+      expect(height).to.equal('200')
       expect(title).to.equal('title')
     })
   })
@@ -931,6 +943,35 @@ var x = 0;
     })
   })
 
+  describe('Footnote Markup', function() {
+    beforeEach(() => {
+      atom.config.set(
+        'markdown-preview-plus.markdownItConfig.useFootnote',
+        true,
+      )
+    })
+    afterEach(() => {
+      atom.config.unset('markdown-preview-plus.markdownItConfig.useFootnote')
+    })
+    it('renders it', async function() {
+      const pv = await createMarkdownPreviewViewFile(
+        path.join(tempPath, 'subdir/footnote.md'),
+      )
+      const html = await previewHTML(pv)
+      expect(html).to.equal(
+        '<p>The quick brown<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> ' +
+          'fox jumped over the lazy dogs.<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]' +
+          '</a></sup></p>\n<hr class="footnotes-sep">\n<section class="footnotes">\n' +
+          '<ol class="footnotes-list">\n<li id="fn1" class="footnote-item">' +
+          '<p>Actually the fox was kind of orange. ' +
+          '<a href="#fnref1" class="footnote-backref">↩︎</a></p>\n</li>\n' +
+          '<li id="fn2" class="footnote-item"><p>Numbers of notes should not matter ' +
+          'for display order. <a href="#fnref2" class="footnote-backref">↩︎</a></p>\n' +
+          '</li>\n</ol>\n</section>\n',
+      )
+    })
+  })
+
   describe('table alignment', function() {
     it('realigns table if markdown changed', async function() {
       const editor = (await atom.workspace.open('nonexistent.md')) as TextEditor
@@ -949,7 +990,10 @@ var x = 0;
       expect(ths[0].style.textAlign).to.equal('left')
       expect(ths[1].style.textAlign).to.equal('center')
       expect(ths[2].style.textAlign).to.equal('right')
-      const spy = sinon.spy<any>(pv, 'renderMarkdown')
+      const spy = sinonPrivateSpy<typeof pv['renderMarkdown']>(
+        pv,
+        'renderMarkdown',
+      )
       editor.setText(`\
 | Tables        |      Are      |  Cool |
 |:--------------|:-------------:|:------|

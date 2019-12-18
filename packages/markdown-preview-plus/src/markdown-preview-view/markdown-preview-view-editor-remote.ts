@@ -63,9 +63,7 @@ export class MarkdownPreviewViewEditorRemote extends MarkdownPreviewView {
   }
 
   public getURI() {
-    return `markdown-preview-plus://remote-editor/${this.windowId}/${
-      this.editorId
-    }`
+    return `markdown-preview-plus://remote-editor/${this.windowId}/${this.editorId}`
   }
 
   public getPath() {
@@ -99,7 +97,7 @@ export class MarkdownPreviewViewEditorRemote extends MarkdownPreviewView {
 
   protected openSource(initialLine?: number) {
     this.ipc.openSource(initialLine).catch((e) => {
-      console.log(e)
+      console.error(e)
       const path = this.getPath()
       if (path) {
         handlePromise(

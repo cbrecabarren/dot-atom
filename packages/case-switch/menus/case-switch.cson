@@ -1,0 +1,34 @@
+# See https://atom.io/docs/latest/creating-a-package#menus for more details
+'context-menu':
+  'atom-text-editor': [
+    {
+      'label': 'Toggle case-switch'
+      'command': 'case-switch:toggle'
+    }
+  ]
+'menu': [
+  {
+    'label': 'Packages'
+    'submenu': [
+      'label': 'Case Switch'
+      'submenu': [
+        {
+          'label': 'Toggle'
+          'command': 'case-switch:toggle'
+        },
+        {
+          'label': 'Convert to CamelCase'
+          'command': 'case-switch:convert-to-camel-case'
+        },
+        {
+          'label': 'Convert to snake_case'
+          'command': 'case-switch:convert-to-snake-case'
+        },
+        {
+          'label': 'Convert to kebab-case'
+          'command': 'case-switch:convert-to-kebab-case'
+        }
+      ]
+    ]
+  }
+]

@@ -17,21 +17,25 @@
 #   'ctrl-p': 'core:move-down'
 #
 
-'body':
-  'ctrl-x ctrl-s': 'core:save'
-  'ctrl-x ctrl-right': 'pane:show-next-item'
-  'ctrl-x ctrl-left': 'pane:show-previous-item'
-  'ctrl-x ctrl-c': 'application:quit'
-  'ctrl-x ctrl-f': 'closed:Open File'
-
-'.atom-workspace':
-  'ctrl-g': 'core:cancel'
+# 'body':
+#   'ctrl-x ctrl-s': 'core:save'
+#   'ctrl-x ctrl-right': 'pane:show-next-item'
+#   'ctrl-x ctrl-left': 'pane:show-previous-item'
+#   'ctrl-x ctrl-c': 'application:quit'
+#   'ctrl-x ctrl-f': 'closed:Open File'
+#
+# '.atom-workspace':
+#   'ctrl-g': 'core:cancel'
+#
 
 'atom-text-editor':
-  'ctrl-x h': 'core:select-all'
-  'ctrl-j': 'editor:newline'
+#   'ctrl-x h': 'core:select-all'
+#   'ctrl-j': 'editor:newline'
+  'ctrl-g': 'find-and-replace:find-next'
+  'ctrl-shift-g': 'find-and-replace:find-previous'
 
-'atom-text-editor:not([mini])':
-  'tab tab': 'editor:indent'
-  'tab': 'emacs-flow:auto-indent'
-  'ctrl-<': 'snippets:expand'
+#
+# 'atom-text-editor:not([mini])':
+#   'tab tab': 'editor:indent'
+#   'tab': 'emacs-flow:auto-indent'
+#   'ctrl-<': 'snippets:expand'
