@@ -1,61 +1,42 @@
 {
-  "_args": [
-    [
-      {
-        "raw": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117413-38024-19vw6ek.muaerhehfr/package.tgz",
-        "scope": null,
-        "escapedName": null,
-        "name": null,
-        "rawSpec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117413-38024-19vw6ek.muaerhehfr/package.tgz",
-        "spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117413-38024-19vw6ek.muaerhehfr/package.tgz",
-        "type": "local"
-      },
-      "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-117413-38024-1eb3pou.6475vcxr"
-    ]
-  ],
-  "_from": "../d-117413-38024-19vw6ek.muaerhehfr/package.tgz",
-  "_id": "monokai@0.24.0",
-  "_inCache": true,
-  "_installable": true,
+  "_from": "https://www.atom.io/api/packages/monokai/versions/0.27.0/tarball",
+  "_id": "monokai@0.27.0",
+  "_inBundle": false,
+  "_integrity": "sha512-Bp6UfJGp0KJty60TcE1+pMU5R0+MvjwbpIoLr3mh5ZCMMlMjZQ+8gc7Y5dXFI7pI32BnjFnCyLoNNuqzshrb5w==",
   "_location": "/monokai",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117413-38024-19vw6ek.muaerhehfr/package.tgz",
-    "scope": null,
-    "escapedName": null,
-    "name": null,
-    "rawSpec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117413-38024-19vw6ek.muaerhehfr/package.tgz",
-    "spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117413-38024-19vw6ek.muaerhehfr/package.tgz",
-    "type": "local"
+    "type": "remote",
+    "raw": "https://www.atom.io/api/packages/monokai/versions/0.27.0/tarball",
+    "rawSpec": "https://www.atom.io/api/packages/monokai/versions/0.27.0/tarball",
+    "saveSpec": "https://www.atom.io/api/packages/monokai/versions/0.27.0/tarball",
+    "fetchSpec": "https://www.atom.io/api/packages/monokai/versions/0.27.0/tarball"
   },
   "_requiredBy": [
-    "#USER"
+    "#USER",
+    "/"
   ],
-  "_resolved": "file:../d-117413-38024-19vw6ek.muaerhehfr/package.tgz",
-  "_shasum": "7efb452093a60ef4f25d0232d6b4c95d98a333e1",
-  "_shrinkwrap": null,
-  "_spec": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/d-117413-38024-19vw6ek.muaerhehfr/package.tgz",
-  "_where": "/private/var/folders/59/3c5vcjbn4l30bhb2b8z45g300000gn/T/apm-install-dir-117413-38024-1eb3pou.6475vcxr",
+  "_resolved": "https://www.atom.io/api/packages/monokai/versions/0.27.0/tarball",
+  "_shasum": "93374a2b91d5909e21b827c71151a5e41f7332b7",
+  "_spec": "https://www.atom.io/api/packages/monokai/versions/0.27.0/tarball",
+  "_where": "/tmp/apm-install-dir-202105-22006-djclun.o22t6",
   "bugs": {
     "url": "https://github.com/kevinsawicki/monokai/issues"
   },
-  "dependencies": {},
+  "bundleDependencies": false,
+  "deprecated": false,
   "description": "A monokai theme",
-  "devDependencies": {},
   "engines": {
     "atom": ">=1.13.0"
   },
   "homepage": "https://github.com/kevinsawicki/monokai#readme",
   "license": "MIT",
   "name": "monokai",
-  "optionalDependencies": {},
   "private": true,
-  "readme": "# Monokai theme\n\nA monokai syntax theme for Atom.\n\nOriginally converted from the [TextMate](http://www.monokai.nl/blog/wp-content/asdev/Monokai.tmTheme)\ntheme using the [TextMate bundle converter](http://flight-manual.atom.io/hacking-atom/sections/converting-from-textmate/).\n\n![](https://f.cloud.github.com/assets/671378/2265671/d02ebee8-9e85-11e3-9b8c-12b2cb7015e3.png)\n",
-  "readmeFilename": "README.md",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kevinsawicki/monokai.git"
   },
   "theme": "syntax",
-  "version": "0.24.0"
+  "version": "0.27.0"
 }

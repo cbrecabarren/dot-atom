@@ -43,6 +43,14 @@ export const config: IConfig = {
       type: 'string',
     },
   },
+  disableToolBarIntegration: {
+    title: 'Disable Tool Bar integration',
+    description:
+      'Do not add the preview button to tool bar (only relevant if [tool-bar](https://atom.io/packages/tool-bar) package is installed)',
+    type: 'boolean',
+    default: false,
+    order: 0.5,
+  },
   useGitHubStyle: {
     title: 'Use GitHub.com style',
     type: 'boolean',
@@ -106,6 +114,30 @@ export const config: IConfig = {
         default: true,
         order: 10,
       },
+      diffMethod: {
+        title: 'Diff Method',
+        description:
+          'Advanced diffing method selection when updating the preview. ' +
+          'None is obviously fastest, but inaccurate; heuristic is reasonably fast and ' +
+          'should work most of the time; myers uses classic min-diff algoritm, but can be ' +
+          'slow on large documents',
+        type: 'string',
+        enum: ['none', 'heuristic', 'myers'],
+        default: 'heuristic',
+        order: 15,
+      },
+      highlighter: {
+        title: 'Code Highlighter',
+        description:
+          'What is used for highlighting code in code blocks. `none` is no highlighting, ' +
+          '`legacy` is fast, but only supports legacy textmate grammars. `tree-sitter-compatible` ' +
+          "uses Atom's internal highlighting API, and hence is compatible with tree-sitter grammars, " +
+          ' but it can be slower than `legacy` and is not as well-tested',
+        type: 'string',
+        enum: ['none', 'legacy', 'tree-sitter-compatible'],
+        default: 'tree-sitter-compatible',
+        order: 15,
+      },
       previewSplitPaneDir: {
         title: 'Direction to load the preview in split pane',
         type: 'string',
@@ -131,6 +163,17 @@ export const config: IConfig = {
         type: 'boolean',
         default: false,
         order: 27,
+      },
+      nativePageScrollKeys: {
+        title: 'Use native scroll keys in preview',
+        description:
+          'Will use arrow keys, page up, page down, home, end and space for native navigation in preview. ' +
+          'The upside is smoother scroll behaviour. The downside is that when this option is enabled, these keys ' +
+          'will be invisible to Atom when preview is focused, so those can not be used in keymap with preview-focused ' +
+          'commands. Also unlike non-native commands, these are non-rebindable.',
+        type: 'boolean',
+        default: true,
+        order: 27.5,
       },
       shellOpenFileExtensions: {
         title: 'Always open links to these file types externally',
@@ -203,6 +246,31 @@ export const config: IConfig = {
         order: 20,
         enum: ['html', 'pdf'],
         default: 'html',
+      },
+      openOnSave: {
+        type: 'object',
+        title: 'Open after saving',
+        order: 21,
+        properties: {
+          html: {
+            title: 'HTML',
+            type: 'boolean',
+            default: true,
+            order: 10,
+          },
+          pdf: {
+            title: 'PDF',
+            type: 'boolean',
+            default: false,
+            order: 20,
+          },
+        },
+      },
+      makePDFOverwrite: {
+        type: 'boolean',
+        title: '`Make PDF` on Tree View will overwrite files without prompt',
+        order: 22,
+        default: false,
       },
       saveToPDFOptions: {
         title: 'Save to PDF options',
@@ -368,6 +436,14 @@ export const config: IConfig = {
         default: false,
         order: 0,
       },
+      typographicReplacements: {
+        title: 'Typographic Replacements',
+        description:
+          'Replace (R) with ®, (c) with ©, (p) with §, -- with –, enable smart quotes, etc',
+        type: 'boolean',
+        default: true,
+        order: 1,
+      },
       useLazyHeaders: {
         title: 'Use Lazy Headers with markdown-it parser',
         description: 'Require no space after headings #',
@@ -396,6 +472,21 @@ export const config: IConfig = {
         default: false,
         order: 20,
       },
+      forceFullToc: {
+        title: 'Force full table of contents',
+        description:
+          'Renders all the headers in TOC, even if they are in incorrect order',
+        type: 'boolean',
+        default: false,
+        order: 21,
+      },
+      tocDepth: {
+        title: 'Depth of Table of Contents',
+        description: 'Maximum header depth that will be included in TOC',
+        type: 'integer',
+        default: 2,
+        order: 22,
+      },
       useImsize: {
         title: 'Allow specifying image size in image title',
         description:
@@ -420,13 +511,98 @@ export const config: IConfig = {
         default: false,
         order: 45,
       },
+      useAttributes: {
+        // "markdown-it-attrs"
+        title: 'Enable attributes',
+        description:
+          'Allow braced `{}` attributes after inline/block elements. Also sets `id` with `#` and `class` with `.`' +
+          '\n\nF.ex.: `*emphasis*{#id-emphasis .class-emphasis data-attribute=emphasis}`' +
+          '\n\n**NOTE:** this is implicitly enabled by bracketed spans and fenced divs.' +
+          '\n\nSee [package page](https://npmjs.com/package/markdown-it-attrs) for more information.',
+        type: 'boolean',
+        default: false,
+        order: 50,
+      },
+      useSpans: {
+        // "markdown-it-bracketed-spans"
+        title: 'Enable bracketed spans',
+        description:
+          '**NOTE:** implicitly enables attributes.' +
+          '\n\nSee [package page](https://npmjs.com/package/markdown-it-bracketed-spans) for more information.',
+        type: 'boolean',
+        default: false,
+        order: 60,
+      },
+      useDivs: {
+        // "markdown-it-container"
+        title: 'Enable fenced divs',
+        description:
+          '**NOTE:** implicitly enables attributes.' +
+          '\n\nSee [package page](https://npmjs.com/package/markdown-it-container) for more information.',
+        type: 'boolean',
+        default: false,
+        order: 70,
+      },
+      useDeflist: {
+        // "markdown-it-deflist"
+        title: 'Enable definition lists',
+        description:
+          '\n\nSee [package page](https://npmjs.com/package/markdown-it-deflist) for more information.',
+        type: 'boolean',
+        default: false,
+        order: 80,
+      },
+      useFontmatter: {
+        // "markdown-it-front-matter"
+        title: 'Enable YAML fontmatter',
+        description:
+          '\n\nSee [package page](https://npmjs.com/package/markdown-it-front-matter) for more information.',
+        type: 'boolean',
+        default: true,
+        order: 90,
+      },
+      useImplicitFigures: {
+        // "markdown-it-implicit-figures"
+        title: 'Enable implicitFigures',
+        description:
+          '\n\nSee [package page](https://npmjs.com/package/markdown-it-implicit-figures) for more information.',
+        type: 'boolean',
+        default: false,
+        order: 100,
+      },
+      useSubscript: {
+        // "markdown-it-sub"
+        title: 'Enable subscripts',
+        description:
+          '\n\nSee [package page](https://npmjs.com/package/markdown-it-sub) for more information.',
+        type: 'boolean',
+        default: false,
+        order: 110,
+      },
+      useSuperscript: {
+        // "markdown-it-sup"
+        title: 'Enable superscripts',
+        description:
+          '\n\nSee [package page](https://npmjs.com/package/markdown-it-sup) for more information.',
+        type: 'boolean',
+        default: false,
+        order: 120,
+      },
+      tableCaptions: {
+        title: 'Enable table captions',
+        description:
+          'Table captions as in Pandoc Markdown, e.g. `: caption` or `Table: caption`, etc.',
+        type: 'boolean',
+        default: false,
+        order: 125,
+      },
       inlineMathSeparators: {
         title: 'Inline math separators',
         description:
           'List of inline math separators in pairs -- first opening, then closing',
         type: 'array',
         default: ['$', '$', '\\(', '\\)'],
-        order: 110,
+        order: 1010,
         items: {
           type: 'string',
         },
@@ -437,10 +613,18 @@ export const config: IConfig = {
           'List of block math separators in pairs -- first opening, then closing',
         type: 'array',
         default: ['$$', '$$', '\\[', '\\]'],
-        order: 120,
+        order: 1020,
         items: {
           type: 'string',
         },
+      },
+      parseDisplayMathInline: {
+        title: 'Parse display math inline',
+        description:
+          'Will parse display ("block") math as inline elements, like pandoc',
+        type: 'boolean',
+        default: false,
+        order: 1050,
       },
     },
   },
@@ -550,6 +734,7 @@ declare module 'atom' {
   interface ConfigValues {
     'markdown-preview-plus.grammars': string[]
     'markdown-preview-plus.extensions': string[]
+    'markdown-preview-plus.disableToolBarIntegration': boolean
     'markdown-preview-plus.useGitHubStyle': boolean
     'markdown-preview-plus.syntaxThemeName': string
     'markdown-preview-plus.importPackageStyles': string[]
@@ -557,6 +742,14 @@ declare module 'atom' {
     'markdown-preview-plus.renderer': 'markdown-it' | 'pandoc'
     'markdown-preview-plus.richClipboard': boolean
     'markdown-preview-plus.previewConfig.liveUpdate': boolean
+    'markdown-preview-plus.previewConfig.diffMethod':
+      | 'none'
+      | 'heuristic'
+      | 'myers'
+    'markdown-preview-plus.previewConfig.highlighter':
+      | 'none'
+      | 'legacy'
+      | 'tree-sitter-compatible'
     'markdown-preview-plus.previewConfig.previewSplitPaneDir':
       | 'down'
       | 'right'
@@ -568,13 +761,17 @@ declare module 'atom' {
       | 'center'
     'markdown-preview-plus.previewConfig.closePreviewWithEditor': boolean
     'markdown-preview-plus.previewConfig.activatePreviewWithEditor': boolean
+    'markdown-preview-plus.previewConfig.nativePageScrollKeys': boolean
     'markdown-preview-plus.previewConfig.shellOpenFileExtensions': string[]
     'markdown-preview-plus.previewConfig': {
       liveUpdate: boolean
+      diffMethod: 'none' | 'heuristic' | 'myers'
+      highlighter: 'none' | 'legacy' | 'tree-sitter-compatible'
       previewSplitPaneDir: 'down' | 'right' | 'none'
       previewDock: 'left' | 'right' | 'bottom' | 'center'
       closePreviewWithEditor: boolean
       activatePreviewWithEditor: boolean
+      nativePageScrollKeys: boolean
       shellOpenFileExtensions: string[]
     }
     'markdown-preview-plus.saveConfig.mediaOnSaveAsHTMLBehaviour':
@@ -586,6 +783,13 @@ declare module 'atom' {
       | 'absolutized'
       | 'untouched'
     'markdown-preview-plus.saveConfig.defaultSaveFormat': 'html' | 'pdf'
+    'markdown-preview-plus.saveConfig.openOnSave.html': boolean
+    'markdown-preview-plus.saveConfig.openOnSave.pdf': boolean
+    'markdown-preview-plus.saveConfig.openOnSave': {
+      html: boolean
+      pdf: boolean
+    }
+    'markdown-preview-plus.saveConfig.makePDFOverwrite': boolean
     'markdown-preview-plus.saveConfig.saveToPDFOptions.latexRenderer':
       | 'Same as live preview'
       | 'HTML-CSS'
@@ -616,6 +820,13 @@ declare module 'atom' {
       mediaOnSaveAsHTMLBehaviour: 'relativized' | 'absolutized' | 'untouched'
       mediaOnCopyAsHTMLBehaviour: 'relativized' | 'absolutized' | 'untouched'
       defaultSaveFormat: 'html' | 'pdf'
+      'openOnSave.html': boolean
+      'openOnSave.pdf': boolean
+      openOnSave: {
+        html: boolean
+        pdf: boolean
+      }
+      makePDFOverwrite: boolean
       'saveToPDFOptions.latexRenderer':
         | 'Same as live preview'
         | 'HTML-CSS'
@@ -664,26 +875,52 @@ declare module 'atom' {
       undefinedFamily: string
     }
     'markdown-preview-plus.markdownItConfig.breakOnSingleNewline': boolean
+    'markdown-preview-plus.markdownItConfig.typographicReplacements': boolean
     'markdown-preview-plus.markdownItConfig.useLazyHeaders': boolean
     'markdown-preview-plus.markdownItConfig.useCheckBoxes': boolean
     'markdown-preview-plus.markdownItConfig.useEmoji': boolean
     'markdown-preview-plus.markdownItConfig.useToc': boolean
+    'markdown-preview-plus.markdownItConfig.forceFullToc': boolean
+    'markdown-preview-plus.markdownItConfig.tocDepth': number
     'markdown-preview-plus.markdownItConfig.useImsize': boolean
     'markdown-preview-plus.markdownItConfig.useCriticMarkup': boolean
     'markdown-preview-plus.markdownItConfig.useFootnote': boolean
+    'markdown-preview-plus.markdownItConfig.useAttributes': boolean
+    'markdown-preview-plus.markdownItConfig.useSpans': boolean
+    'markdown-preview-plus.markdownItConfig.useDivs': boolean
+    'markdown-preview-plus.markdownItConfig.useDeflist': boolean
+    'markdown-preview-plus.markdownItConfig.useFontmatter': boolean
+    'markdown-preview-plus.markdownItConfig.useImplicitFigures': boolean
+    'markdown-preview-plus.markdownItConfig.useSubscript': boolean
+    'markdown-preview-plus.markdownItConfig.useSuperscript': boolean
+    'markdown-preview-plus.markdownItConfig.tableCaptions': boolean
     'markdown-preview-plus.markdownItConfig.inlineMathSeparators': string[]
     'markdown-preview-plus.markdownItConfig.blockMathSeparators': string[]
+    'markdown-preview-plus.markdownItConfig.parseDisplayMathInline': boolean
     'markdown-preview-plus.markdownItConfig': {
       breakOnSingleNewline: boolean
+      typographicReplacements: boolean
       useLazyHeaders: boolean
       useCheckBoxes: boolean
       useEmoji: boolean
       useToc: boolean
+      forceFullToc: boolean
+      tocDepth: number
       useImsize: boolean
       useCriticMarkup: boolean
       useFootnote: boolean
+      useAttributes: boolean
+      useSpans: boolean
+      useDivs: boolean
+      useDeflist: boolean
+      useFontmatter: boolean
+      useImplicitFigures: boolean
+      useSubscript: boolean
+      useSuperscript: boolean
+      tableCaptions: boolean
       inlineMathSeparators: string[]
       blockMathSeparators: string[]
+      parseDisplayMathInline: boolean
     }
     'markdown-preview-plus.pandocConfig.useNativePandocCodeStyles': boolean
     'markdown-preview-plus.pandocConfig.pandocPath': string
@@ -712,6 +949,7 @@ declare module 'atom' {
     'markdown-preview-plus': {
       grammars: string[]
       extensions: string[]
+      disableToolBarIntegration: boolean
       useGitHubStyle: boolean
       syntaxThemeName: string
       importPackageStyles: string[]
@@ -719,17 +957,23 @@ declare module 'atom' {
       renderer: 'markdown-it' | 'pandoc'
       richClipboard: boolean
       'previewConfig.liveUpdate': boolean
+      'previewConfig.diffMethod': 'none' | 'heuristic' | 'myers'
+      'previewConfig.highlighter': 'none' | 'legacy' | 'tree-sitter-compatible'
       'previewConfig.previewSplitPaneDir': 'down' | 'right' | 'none'
       'previewConfig.previewDock': 'left' | 'right' | 'bottom' | 'center'
       'previewConfig.closePreviewWithEditor': boolean
       'previewConfig.activatePreviewWithEditor': boolean
+      'previewConfig.nativePageScrollKeys': boolean
       'previewConfig.shellOpenFileExtensions': string[]
       previewConfig: {
         liveUpdate: boolean
+        diffMethod: 'none' | 'heuristic' | 'myers'
+        highlighter: 'none' | 'legacy' | 'tree-sitter-compatible'
         previewSplitPaneDir: 'down' | 'right' | 'none'
         previewDock: 'left' | 'right' | 'bottom' | 'center'
         closePreviewWithEditor: boolean
         activatePreviewWithEditor: boolean
+        nativePageScrollKeys: boolean
         shellOpenFileExtensions: string[]
       }
       'saveConfig.mediaOnSaveAsHTMLBehaviour':
@@ -741,6 +985,13 @@ declare module 'atom' {
         | 'absolutized'
         | 'untouched'
       'saveConfig.defaultSaveFormat': 'html' | 'pdf'
+      'saveConfig.openOnSave.html': boolean
+      'saveConfig.openOnSave.pdf': boolean
+      'saveConfig.openOnSave': {
+        html: boolean
+        pdf: boolean
+      }
+      'saveConfig.makePDFOverwrite': boolean
       'saveConfig.saveToPDFOptions.latexRenderer':
         | 'Same as live preview'
         | 'HTML-CSS'
@@ -771,6 +1022,13 @@ declare module 'atom' {
         mediaOnSaveAsHTMLBehaviour: 'relativized' | 'absolutized' | 'untouched'
         mediaOnCopyAsHTMLBehaviour: 'relativized' | 'absolutized' | 'untouched'
         defaultSaveFormat: 'html' | 'pdf'
+        'openOnSave.html': boolean
+        'openOnSave.pdf': boolean
+        openOnSave: {
+          html: boolean
+          pdf: boolean
+        }
+        makePDFOverwrite: boolean
         'saveToPDFOptions.latexRenderer':
           | 'Same as live preview'
           | 'HTML-CSS'
@@ -826,26 +1084,52 @@ declare module 'atom' {
         undefinedFamily: string
       }
       'markdownItConfig.breakOnSingleNewline': boolean
+      'markdownItConfig.typographicReplacements': boolean
       'markdownItConfig.useLazyHeaders': boolean
       'markdownItConfig.useCheckBoxes': boolean
       'markdownItConfig.useEmoji': boolean
       'markdownItConfig.useToc': boolean
+      'markdownItConfig.forceFullToc': boolean
+      'markdownItConfig.tocDepth': number
       'markdownItConfig.useImsize': boolean
       'markdownItConfig.useCriticMarkup': boolean
       'markdownItConfig.useFootnote': boolean
+      'markdownItConfig.useAttributes': boolean
+      'markdownItConfig.useSpans': boolean
+      'markdownItConfig.useDivs': boolean
+      'markdownItConfig.useDeflist': boolean
+      'markdownItConfig.useFontmatter': boolean
+      'markdownItConfig.useImplicitFigures': boolean
+      'markdownItConfig.useSubscript': boolean
+      'markdownItConfig.useSuperscript': boolean
+      'markdownItConfig.tableCaptions': boolean
       'markdownItConfig.inlineMathSeparators': string[]
       'markdownItConfig.blockMathSeparators': string[]
+      'markdownItConfig.parseDisplayMathInline': boolean
       markdownItConfig: {
         breakOnSingleNewline: boolean
+        typographicReplacements: boolean
         useLazyHeaders: boolean
         useCheckBoxes: boolean
         useEmoji: boolean
         useToc: boolean
+        forceFullToc: boolean
+        tocDepth: number
         useImsize: boolean
         useCriticMarkup: boolean
         useFootnote: boolean
+        useAttributes: boolean
+        useSpans: boolean
+        useDivs: boolean
+        useDeflist: boolean
+        useFontmatter: boolean
+        useImplicitFigures: boolean
+        useSubscript: boolean
+        useSuperscript: boolean
+        tableCaptions: boolean
         inlineMathSeparators: string[]
         blockMathSeparators: string[]
+        parseDisplayMathInline: boolean
       }
       'pandocConfig.useNativePandocCodeStyles': boolean
       'pandocConfig.pandocPath': string

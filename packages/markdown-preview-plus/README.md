@@ -1,7 +1,6 @@
 # Markdown Preview Plus (MPP)
 
-[![appveyor](https://img.shields.io/appveyor/ci/lierdakil/markdown-preview-plus/master.svg?label=appveyor)](https://ci.appveyor.com/project/lierdakil/markdown-preview-plus/branch/master)
-[![travis](https://img.shields.io/travis/atom-community/markdown-preview-plus/master.svg?label=travis)](https://travis-ci.org/atom-community/markdown-preview-plus)
+[![CI](https://github.com/atom-community/markdown-preview-plus/workflows/CI/badge.svg?branch=master)](https://github.com/atom-community/markdown-preview-plus/actions)
 ![apm version](https://img.shields.io/apm/v/markdown-preview-plus.svg)
 ![apm
 downloads](https://img.shields.io/apm/dm/markdown-preview-plus.svg)
@@ -9,7 +8,7 @@ downloads](https://img.shields.io/apm/dm/markdown-preview-plus.svg)
 
 Markdown Preview Plus (MPP) is a fork of [Markdown
 Preview](https://github.com/atom/markdown-preview) that provides a
-real-time preview of markdown documents.
+real-time preview of markdown documents.  (Note: This is not the Chrome browser extension of the same name, which can be found [here](https://github.com/volca/markdown-preview)).
 
 Should you have any problems while installing or using MPP please open
 up a [new

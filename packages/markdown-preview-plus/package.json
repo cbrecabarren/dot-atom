@@ -1,46 +1,56 @@
 {
-  "_from": "https://www.atom.io/api/packages/markdown-preview-plus/versions/3.9.2/tarball",
-  "_id": "markdown-preview-plus@3.9.2",
+  "_from": "https://www.atom.io/api/packages/markdown-preview-plus/versions/4.9.0/tarball",
+  "_id": "markdown-preview-plus@4.9.0",
   "_inBundle": false,
-  "_integrity": "sha512-kgmFEht38vACZmkfEgr7ZQUX1THW9BBtmkEOTCPxuMzL4k+UAheQNgy7X/F33cMuMKf4iVdgJcKBVFIJeoZNQw==",
+  "_integrity": "sha512-emgi1XYnXqkMA6umzCT6JkKBgaTEf1A8e4/Ecthp6TjB/41cUHa8BEsTlTD4VcO4CMwF98Wa0Quyxhs1RdlncQ==",
   "_location": "/markdown-preview-plus",
   "_phantomChildren": {},
   "_requested": {
     "type": "remote",
-    "raw": "https://www.atom.io/api/packages/markdown-preview-plus/versions/3.9.2/tarball",
-    "rawSpec": "https://www.atom.io/api/packages/markdown-preview-plus/versions/3.9.2/tarball",
-    "saveSpec": "https://www.atom.io/api/packages/markdown-preview-plus/versions/3.9.2/tarball",
-    "fetchSpec": "https://www.atom.io/api/packages/markdown-preview-plus/versions/3.9.2/tarball"
+    "raw": "https://www.atom.io/api/packages/markdown-preview-plus/versions/4.9.0/tarball",
+    "rawSpec": "https://www.atom.io/api/packages/markdown-preview-plus/versions/4.9.0/tarball",
+    "saveSpec": "https://www.atom.io/api/packages/markdown-preview-plus/versions/4.9.0/tarball",
+    "fetchSpec": "https://www.atom.io/api/packages/markdown-preview-plus/versions/4.9.0/tarball"
   },
   "_requiredBy": [
     "#USER",
     "/"
   ],
-  "_resolved": "https://www.atom.io/api/packages/markdown-preview-plus/versions/3.9.2/tarball",
-  "_shasum": "0da0bcd61b96a857a0702f93c3e162831339796f",
-  "_spec": "https://www.atom.io/api/packages/markdown-preview-plus/versions/3.9.2/tarball",
-  "_where": "/tmp/apm-install-dir-119817-21486-o6u83t.c9fj",
+  "_resolved": "https://www.atom.io/api/packages/markdown-preview-plus/versions/4.9.0/tarball",
+  "_shasum": "2ba5eb5cec6b1120d2784c63bdb2d295bb140698",
+  "_spec": "https://www.atom.io/api/packages/markdown-preview-plus/versions/4.9.0/tarball",
+  "_where": "/tmp/apm-install-dir-202105-21989-1yel8rn.m5fug",
   "atomTestRunner": "./node_modules/atom-ts-spec-runner/runner.js",
+  "atomTranspilers": [
+    {
+      "transpiler": "atom-ts-transpiler",
+      "glob": "{!(node_modules)/**/,}*.ts?(x)",
+      "options": {
+        "compilerOptions": {
+          "target": "es2017",
+          "module": "commonjs"
+        },
+        "cacheKeyFiles": [],
+        "verbose": false
+      }
+    }
+  ],
   "bugs": {
     "url": "https://github.com/atom-community/markdown-preview-plus/issues"
   },
+  "bundle": "./dist/main.js",
   "bundleDependencies": false,
+  "client": "./client/main.js",
+  "consumedServices": {
+    "tool-bar": {
+      "versions": {
+        "^0 || ^1": "consumeToolBar"
+      }
+    }
+  },
   "dependencies": {
-    "atom-select-list": "^0.7.2",
-    "file-uri-to-path": "^1.0.0",
-    "lodash": "^4.17.15",
-    "markdown-it": "^9.0.1",
-    "markdown-it-anchor": "^5.2.4",
-    "markdown-it-emoji": "^1.4.0",
-    "markdown-it-footnote": "^3.0.2",
-    "markdown-it-imsize": "^2.0.1",
-    "markdown-it-lazy-headers": "^0.1.3",
-    "markdown-it-table-of-contents": "^0.4.4",
-    "markdown-it-task-lists": "^2.1.1",
     "mathjax": "https://github.com/atom-community/MathJax/archive/2.7.4-electron.0.1.0.tar.gz",
-    "morphdom": "^2.5.4",
-    "season": "^6.0",
-    "twemoji": "^12.1.2"
+    "twemoji-assets": "https://github.com/lierdakil/twemoji-assets/archive/v12.1.2-assets-0.1.0.tar.gz"
   },
   "deprecated": false,
   "description": "Markdown Preview + Community Features",
@@ -48,35 +58,61 @@
     "markdown-preview-plus/MarkdownPreviewView": "createMarkdownPreviewView"
   },
   "devDependencies": {
-    "@types/atom": "^1.36.1",
-    "@types/chai": "^4.1.7",
-    "@types/fs-extra": "^8.0.0",
-    "@types/lodash": "^4.14.136",
-    "@types/markdown-it": "0.0.8",
-    "@types/mathjax": "0.0.35",
-    "@types/mocha": "^5.2.7",
-    "@types/node": "^8.10.51",
-    "@types/sinon-chai": "^3.2.2",
+    "@babel/preset-typescript": "^7.12.1",
+    "@parcel/transformer-typescript-tsc": "^2.0.0-beta.1",
+    "@types/atom": "^1.40.4",
+    "@types/chai": "^4.2.14",
+    "@types/fs-extra": "^9.0.2",
+    "@types/lodash": "^4.14.162",
+    "@types/markdown-it": "10.0.2",
+    "@types/mathjax": "0.0.36",
+    "@types/mocha": "^8.0.3",
+    "@types/node": "^12.12.54",
+    "@types/sinon-chai": "^3.2.5",
     "@types/temp": "^0.8.34",
     "atom-haskell-tslint-rules": "^0.2.2",
+    "atom-highlight": "^0.5.0",
+    "atom-select-list": "^0.7.2",
     "atom-ts-spec-runner": "^1.1.1",
+    "atom-ts-transpiler": "^1.5.2",
     "chai": "^4.2.0",
-    "electron": "^2.0.18",
-    "fs-extra": "^8.1.0",
+    "electron": "^6.1.12",
+    "file-uri-to-path": "^2.0.0",
+    "fs-extra": "^9.0.1",
     "jasmine-tagged": "^1.1.4",
+    "lodash": "^4.17.20",
+    "markdown-it": "^12.0.1",
+    "markdown-it-anchor": "^6.0.0",
+    "markdown-it-attrs": "^3.0.3",
+    "markdown-it-bracketed-spans": "^1.0.1",
+    "markdown-it-container": "^3.0.0",
+    "markdown-it-deflist": "^2.1.0",
+    "markdown-it-emoji": "^2.0.0",
+    "markdown-it-footnote": "^3.0.2",
+    "markdown-it-front-matter": "^0.2.3",
+    "markdown-it-implicit-figures": "^0.10.0",
+    "markdown-it-lazy-headers": "^0.1.3",
+    "markdown-it-sub": "^1.0.0",
+    "markdown-it-sup": "^1.0.0",
+    "markdown-it-table-of-contents": "^0.4.4",
+    "markdown-it-task-lists": "^2.1.1",
     "markdown-it-testgen": "^0.1.6",
-    "parcel-bundler": "^1.12.3",
-    "prettier": "^1.18.2",
-    "sinon": "^7.3.2",
-    "sinon-chai": "^3.3.0",
-    "temp": "^0.9.0",
-    "tslint": "^5.18.0",
+    "morphdom": "^2.6.1",
+    "parcel": "^2.0.0-beta.1",
+    "pirates": "^4.0.1",
+    "prettier": "^2.1.2",
+    "sinon": "^9.2.0",
+    "sinon-chai": "^3.5.0",
+    "temp": "^0.9.1",
+    "tslint": "^6.1.3",
     "tslint-use-atom-disposables": "0.0.1",
-    "typescript": "^3.5.3",
-    "typescript-tslint-plugin": "0.5.4"
+    "twemoji": "^12.1.6",
+    "typescript": "^4.0.3",
+    "typescript-tslint-plugin": "0.5.5",
+    "yaml": "^1.10.0"
   },
   "engines": {
-    "atom": ">=1.28.0 <2.0.0"
+    "atom": ">=1.48.0 <2.0.0"
   },
   "homepage": "https://github.com/atom-community/markdown-preview-plus#readme",
   "keywords": [
@@ -87,19 +123,60 @@
     "pandoc"
   ],
   "license": "MIT",
-  "main": "./lib/main",
+  "main": "./loader.js",
   "name": "markdown-preview-plus",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/atom-community/markdown-preview-plus.git"
   },
   "scripts": {
-    "build": "tsc -p src && node scripts/build-client.js",
-    "lint": "tslint --project src && tslint --project src-client && tslint --project spec",
+    "build": "npm run build-main && npm run build-client && npm run build-worker",
+    "build-client": "parcel build --target client src-client/main.ts",
+    "build-main": "parcel build --target bundle src/main.ts",
+    "build-worker": "parcel build --no-scope-hoist --target worker src-worker/main.ts",
+    "lint": "tslint --project src && tslint --project src-client && tslint --project src-worker && tslint --project spec",
     "prettier": "prettier --write 'src/**/*.ts' 'src-client/**/*.ts' 'spec/**/*.ts'",
     "prettier-check": "prettier -l 'src/**/*.ts' 'src-client/**/*.ts' 'spec/**/*.ts'",
     "test": "npm run typecheck && npm run lint && npm run prettier-check",
-    "typecheck": "tsc --noEmit -p src && tsc --noEmit -p src-client && tsc --noEmit -p spec"
+    "typecheck": "tsc --noEmit -p src && tsc --noEmit -p src-client && tsc --noEmit -p src-worker && tsc --noEmit -p spec",
+    "watch-worker": "parcel watch --target worker src-worker/main.ts"
   },
-  "version": "3.9.2"
+  "targets": {
+    "bundle": {
+      "context": "electron-renderer",
+      "includeNodeModules": {
+        "atom": false,
+        "electron": false
+      },
+      "outputFormat": "commonjs",
+      "isLibrary": true,
+      "sourceMap": {
+        "inlineSources": true
+      }
+    },
+    "client": {
+      "context": "electron-renderer",
+      "includeNodeModules": {
+        "atom": false,
+        "electron": false,
+        "mathjax": false,
+        "twemoji-assets": false
+      },
+      "outputFormat": "commonjs",
+      "isLibrary": true,
+      "sourceMap": {
+        "inlineSources": true
+      }
+    },
+    "worker": {
+      "context": "web-worker",
+      "includeNodeModules": true,
+      "outputFormat": "global",
+      "isLibrary": true,
+      "sourceMap": {
+        "inlineSources": true
+      }
+    }
+  },
+  "version": "4.9.0"
 }

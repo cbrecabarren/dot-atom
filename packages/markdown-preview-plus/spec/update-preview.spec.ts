@@ -1,5 +1,5 @@
 import * as path from 'path'
-import { MarkdownPreviewView } from '../lib/markdown-preview-view'
+import { MarkdownPreviewView } from '../src/markdown-preview-view'
 import { TextEditor } from 'atom'
 import {
   expectPreviewInSplitPane,
@@ -9,20 +9,20 @@ import {
 } from './util'
 import { expect } from 'chai'
 
-describe('the difference algorithm that updates the preview', function() {
+describe('the difference algorithm that updates the preview', function () {
   let editor: TextEditor
   let preview: MarkdownPreviewView
 
   before(async () => activateMe())
   after(async () => atom.packages.deactivatePackage('markdown-preview-plus'))
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     await atom.workspace.open(path.join(__dirname, 'fixtures', 'sync.md'))
 
     editor = atom.workspace.getActiveTextEditor()!
   })
 
-  afterEach(async function() {
+  afterEach(async function () {
     atom.config.unset('markdown-preview-plus')
     for (const item of atom.workspace.getPaneItems()) {
       const pane = atom.workspace.paneForItem(item)
@@ -38,12 +38,12 @@ describe('the difference algorithm that updates the preview', function() {
     preview = await expectPreviewInSplitPane()
   }
 
-  describe('updating ordered lists start number', function() {
+  describe('updating ordered lists start number', function () {
     let orderedLists: Element[]
 
-    beforeEach(async function() {
+    beforeEach(async function () {
       await loadPreviewInSplitPane()
-      await waitsFor(async function() {
+      await waitsFor(async function () {
         orderedLists = Array.from(
           (await previewFragment(preview)).querySelectorAll('ol'),
         )
@@ -63,10 +63,16 @@ describe('the difference algorithm that updates the preview', function() {
       })
     }
 
-    it("sets the start attribute when the start number isn't 1", async function() {
+    it("sets the start attribute when the start number isn't 1", async function () {
       expectOrderedListsToStartAt(['1', '1', '1', '1', '1'])
 
-      editor.setTextInBufferRange([[35, 0], [35, 12]], '2. Ordered 1')
+      editor.setTextInBufferRange(
+        [
+          [35, 0],
+          [35, 12],
+        ],
+        '2. Ordered 1',
+      )
       await waitsFor.msg(
         '1st ordered list start attribute to update',
         async () => {
@@ -78,7 +84,13 @@ describe('the difference algorithm that updates the preview', function() {
       )
       expectOrderedListsToStartAt(['2', '1', '1', '1', '1'])
 
-      editor.setTextInBufferRange([[148, 0], [148, 14]], '> 2. Ordered 1')
+      editor.setTextInBufferRange(
+        [
+          [148, 0],
+          [148, 14],
+        ],
+        '> 2. Ordered 1',
+      )
       await waitsFor.msg(
         'ordered list nested in blockquote start attribute to update',
         async () => {
@@ -90,7 +102,13 @@ describe('the difference algorithm that updates the preview', function() {
       )
       expectOrderedListsToStartAt(['2', '1', '2', '1', '1'])
 
-      editor.setTextInBufferRange([[205, 0], [205, 14]], '  2. Ordered 1')
+      editor.setTextInBufferRange(
+        [
+          [205, 0],
+          [205, 14],
+        ],
+        '  2. Ordered 1',
+      )
 
       await waitsFor.msg(
         'ordered list nested in unordered list start attribute to update',
@@ -104,10 +122,28 @@ describe('the difference algorithm that updates the preview', function() {
       expectOrderedListsToStartAt(['2', '1', '2', '2', '1'])
     })
 
-    it('removes the start attribute when the start number is changed to 1', async function() {
-      editor.setTextInBufferRange([[35, 0], [35, 12]], '2. Ordered 1')
-      editor.setTextInBufferRange([[148, 0], [148, 14]], '> 2. Ordered 1')
-      editor.setTextInBufferRange([[205, 0], [205, 14]], '  2. Ordered 1')
+    it('removes the start attribute when the start number is changed to 1', async function () {
+      editor.setTextInBufferRange(
+        [
+          [35, 0],
+          [35, 12],
+        ],
+        '2. Ordered 1',
+      )
+      editor.setTextInBufferRange(
+        [
+          [148, 0],
+          [148, 14],
+        ],
+        '> 2. Ordered 1',
+      )
+      editor.setTextInBufferRange(
+        [
+          [205, 0],
+          [205, 14],
+        ],
+        '  2. Ordered 1',
+      )
       await waitsFor.msg(
         'ordered lists start attributes to update',
         async () => {
@@ -123,7 +159,13 @@ describe('the difference algorithm that updates the preview', function() {
       )
       expectOrderedListsToStartAt(['2', '1', '2', '2', '1'])
 
-      editor.setTextInBufferRange([[35, 0], [35, 12]], '1. Ordered 1')
+      editor.setTextInBufferRange(
+        [
+          [35, 0],
+          [35, 12],
+        ],
+        '1. Ordered 1',
+      )
 
       await waitsFor.msg(
         '1st ordered list start attribute to be removed',
@@ -136,7 +178,13 @@ describe('the difference algorithm that updates the preview', function() {
       )
       expectOrderedListsToStartAt(['1', '1', '2', '2', '1'])
 
-      editor.setTextInBufferRange([[148, 0], [148, 14]], '> 1. Ordered 1')
+      editor.setTextInBufferRange(
+        [
+          [148, 0],
+          [148, 14],
+        ],
+        '> 1. Ordered 1',
+      )
 
       await waitsFor.msg(
         'ordered list nested in blockquote start attribute to be removed',
@@ -149,7 +197,13 @@ describe('the difference algorithm that updates the preview', function() {
       )
       expectOrderedListsToStartAt(['1', '1', '1', '2', '1'])
 
-      editor.setTextInBufferRange([[205, 0], [205, 14]], '  1. Ordered 1')
+      editor.setTextInBufferRange(
+        [
+          [205, 0],
+          [205, 14],
+        ],
+        '  1. Ordered 1',
+      )
 
       await waitsFor.msg(
         'ordered list nested in unordered list start attribute to be removed',
@@ -164,22 +218,24 @@ describe('the difference algorithm that updates the preview', function() {
     })
   })
 
-  describe('when a maths block is modified', function() {
+  describe('when a maths block is modified', function () {
     let mathBlocks: HTMLElement[]
 
-    beforeEach(async function() {
-      await waitsFor.msg('LaTeX rendering to be enabled', () =>
-        atom.config.set(
-          'markdown-preview-plus.mathConfig.enableLatexRenderingByDefault',
-          true,
-        ),
+    beforeEach(async function () {
+      atom.config.set(
+        'markdown-preview-plus.mathConfig.enableLatexRenderingByDefault',
+        true,
+      )
+      atom.config.set(
+        'markdown-preview-plus.mathConfig.latexRenderer',
+        'HTML-CSS',
       )
 
       await loadPreviewInSplitPane()
 
       await waitsFor.msg(
         'preview to update DOM with span.math containers',
-        async function() {
+        async function () {
           mathBlocks = Array.from(
             (await previewFragment(preview)).querySelectorAll(
               'script[type*="math/tex"]',
@@ -191,7 +247,7 @@ describe('the difference algorithm that updates the preview', function() {
 
       await waitsFor.msg(
         'Maths blocks to be processed by MathJax',
-        async function() {
+        async function () {
           mathBlocks = Array.from(
             (await previewFragment(preview)).querySelectorAll(
               'script[type*="math/tex"]',
@@ -205,79 +261,96 @@ describe('the difference algorithm that updates the preview', function() {
       )
     })
 
-    it('replaces the entire span.math container element', async function() {
-      await preview.runJS<void>(`
-        window.mathSpans = document.querySelectorAll('span.math')
+    it('only updates script textContent in math.span', async function () {
+      const numMathBlocks = await preview.runJS<void>(`
+        window.mathSpans = document.querySelectorAll('span.math > script')
+        window.mathSpans.length
         `)
+      expect(numMathBlocks).to.equal(20)
 
-      editor.setTextInBufferRange([[46, 0], [46, 43]], 'E=mc^2')
+      editor.setTextInBufferRange(
+        [
+          [46, 0],
+          [46, 43],
+        ],
+        'E=mc^2',
+      )
 
       await waitsFor.msg('math span to be updated', async () =>
         preview.runJS<boolean>(`
-          !window.mathSpans[2].isSameNode(document.querySelectorAll('span.math')[2])
+          window.mathSpans[2].textContent.startsWith('E=mc^2')
           `),
       )
 
-      const numMathBlocks = await preview.runJS<number>(
-        `window.mathSpans.length`,
+      await waitsFor.msg('math spans to finish rendering', async () =>
+        preview.runJS<boolean>(`
+          document.querySelectorAll('span.math.temp-MathJax').length === 0
+          `),
       )
-      expect(numMathBlocks).to.equal(20)
 
       const numSameMathBlocks = await preview.runJS<number>(`{
-        const newMathSpans = document.querySelectorAll('span.math')
-        Array.from(window.mathSpans).filter(
-          (x, i) => x.isSameNode(newMathSpans[i])
-        ).length
+        const newMathSpans = document.querySelectorAll('span.math > script')
+        Array.from(window.mathSpans).filter((x, i) => x.isEqualNode(newMathSpans[i])).length
         }`)
-      expect(numSameMathBlocks).to.equal(19)
+      expect(numSameMathBlocks).to.equal(20)
 
       const mathBlocks = (await previewFragment(preview)).querySelectorAll(
         'span.math',
       )
       const modMathBlock = mathBlocks[2]
-      expect(modMathBlock.querySelector('script')!.innerText).to.equal(
-        'E=mc^2\n',
-      )
+      expect(modMathBlock.querySelector('span')!.innerText).to.equal('E=mc2')
     })
 
-    it('subsequently only rerenders the maths block that was modified', async function() {
+    it('subsequently only rerenders the maths block that was modified', async function () {
       await preview.runJS<void>(`
-        window.mathSpans = Array.from(document.querySelectorAll('span.math'))
+        window.mathSpans = Array.from(document.querySelectorAll('span.math > script'))
+          .map(x => x.parentElement)
         `)
 
-      editor.setTextInBufferRange([[46, 0], [46, 43]], 'E=mc^2')
+      editor.setTextInBufferRange(
+        [
+          [46, 0],
+          [46, 43],
+        ],
+        'E=mc^2',
+      )
 
       await waitsFor.msg('math span to be updated', async () =>
         preview.runJS<boolean>(`
-          !window.mathSpans[2].isSameNode(document.querySelectorAll('span.math')[2])
+          window.mathSpans[2].lastElementChild.textContent.startsWith('E=mc^2')
           `),
       )
 
-      await preview.runJS<boolean>(`
-          window.newMath = Array.from(document.querySelectorAll('span.math'))
-          `)
+      await waitsFor.msg('math spans to finish rendering', async () =>
+        preview.runJS<boolean>(`
+          document.querySelectorAll('span.math.temp-MathJax').length === 0
+          `),
+      )
 
-      await preview.runJS<boolean>(`
-          window.diffMath = window.mathSpans.filter((x, idx) => ! x.isSameNode(window.newMath[idx]))
-          `)
+      await preview.runJS<boolean>(`{
+          const newMath = Array.from(document.querySelectorAll('span.math > script'))
+            .map(x => x.parentElement)
+          window.diffMath = newMath.filter((x, idx) =>
+            ! x.firstElementChild.isSameNode(window.mathSpans[idx].firstElementChild)
+          )}`)
 
       expect(await preview.runJS<any>(`window.diffMath.length`)).to.equal(1)
-      expect(
-        await preview.runJS<any>(`window.diffMath[0].tagName.toLowerCase()`),
-      ).to.equal('span')
+      expect(await preview.runJS<any>(`window.diffMath[0].tagName`)).to.equal(
+        'SPAN',
+      )
       expect(await preview.runJS<any>(`window.diffMath[0].className`)).to.equal(
         'math display-math',
       )
       expect(
         await preview.runJS<any>(
-          `window.diffMath[0].querySelector('script').textContent`,
+          `window.diffMath[0].querySelector('div').textContent`,
         ),
-      ).to.equal('E=mc^2\n')
+      ).to.equal('E=mc2')
     })
   })
 
   describe('when a code block is modified', () =>
-    it('updates contents and attributes', async function() {
+    it('updates contents and attributes', async function () {
       await loadPreviewInSplitPane()
 
       const f = await previewFragment(preview)
@@ -300,7 +373,10 @@ describe('the difference algorithm that updates the preview', function() {
       })
 
       editor.setTextInBufferRange(
-        [[23, 0], [24, 9]],
+        [
+          [23, 0],
+          [24, 9],
+        ],
         '```js\nThis is a modified',
       )
 

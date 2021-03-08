@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
-    "target": "es2017",
-    "module": "commonjs",
+    "target": "esnext",
+    "module": "esnext",
     "moduleResolution": "node",
-    "isolatedModules": false,
+    "esModuleInterop": true,
+    "isolatedModules": true,
     "jsx": "react",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
@@ -15,21 +16,29 @@
     "jsxFactory": "etch.dom",
     "preserveConstEnums": true,
     "suppressImplicitAnyIndexErrors": true,
-    "outDir": "../lib",
     "inlineSources": true,
     "inlineSourceMap": true,
     "strictNullChecks": true,
     "allowJs": false,
-    "lib": ["dom", "dom.iterable", "es2017"],
+    "lib": ["dom", "dom.iterable", "es2019"],
     "strict": true,
     "importHelpers": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "plugins": [{ "name": "typescript-tslint-plugin" }]
+    "plugins": [{ "name": "typescript-tslint-plugin" }],
+    "newLine": "LF",
+    "skipLibCheck": true,
+    "noEmit": true
   },
-  "include": ["**/*.ts", "**/*.tsx", "**/*.js", "../src-client/ipc.d.ts"],
-  "compileOnSave": true,
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.js",
+    "../src-client/ipc.d.ts",
+    "../src-worker.d.ts/ipc.d.ts"
+  ],
+  "compileOnSave": false,
   "experimentalDecorators": true
 }

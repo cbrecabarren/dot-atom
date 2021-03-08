@@ -1,3 +1,444 @@
+## 4.9.0
+
+### New features
+
+-   Initial support for Pandoc's sourcepos extension
+
+    New in Pandoc 2.11.3. You need to set Markdown Flavor in MPP's Pandoc settings to `commonmark+sourcepos` (possibly with other extensions) or `commonmark_x+sourcepos` (which has many extensions automatically enabled). Bear in mind this is pretty new, so expect issues.
+
+### Fixes
+
+-   Rework bidirectional scroll sync condition for docks
+
+## 4.8.4
+
+-   [Fix] Let atom's styles override pandoc's, not vice versa
+
+## 4.8.3
+
+### Fixes
+
+-   Fix highlighter syntax detection for newer pandoc versions
+
+    Fixes highlighting for some pandoc code blocks (known to be an issue with pandoc 2.11)
+
+-   Tree-sitter: first close old scopes then open new ones
+
+    Fixes broken highlighting on some grammars
+
+-   Tweak pdf export webview (inside viewport with opacity 0)
+
+    Fixes intermittent hangs during pdf export on newer Atom versions
+
+### Maintenance
+
+-   Move highlighters to separate functions
+-   Move highlighter to separate file
+-   Bump dependencies
+
+## 4.8.2
+
+-   [Fix] Fix html special characters w\/ tree-sitter-compatible highlighter
+
+## 4.8.1
+
+-   [Fix] Build the bundle
+-   [Fix] Dispose of toolbar on deactivation
+
+## 4.8.0
+
+-   [Feat] Option to disable tool-bar integration
+
+## 4.7.1
+
+-   Catch and suppress errors in getScrollSyncParams
+-   Use non-deprecated Buffer interface
+
+## 4.7.0
+
+### New features
+
+-   Add support for tool-bar package (by @aminya)
+
+### Fixes
+
+-   Work around MathJax crash
+
+    This crash usually manifested when math was changed from inline to display. The workaround incurs some slight overhead potentially, but it's certainly better than math engine crashing entirely.
+
+### Maintenance
+
+-   Bump dependencies
+-   Documentation updates
+
+## 4.6.1
+
+-   Improve child\_process latency by manually activating Node's event loop
+
+## 4.6.0
+
+### New features
+
+-   Add `typographicReplacements` option for markdown-it writer
+
+    Enables/disables replacement of `(r), (c), (tm), --, ---` etc with "®, ©, ™, –, —", etc. Enabled by default (backwards compatible).
+
+    Corresponds to Markdown-It `typographer` option. See https://markdown-it.github.io/markdown-it/#MarkdownIt.new for more information (more specifically, see https://github.com/markdown-it/markdown-it/blob/master/lib/rules_core/replacements.js)
+
+### Maintenance
+
+-   \[Bundler\] Use tsc transformer for now
+-   Minor dependency updates
+-   Minor README update (by Robert Kieffer)
+
+## 4.5.0
+
+### Changes
+
+-   Move markdown-it to webworker
+
+    Previously, rendering Markdown was done in the main UI thread, which on larger documents could result in intermittent freezes and overall latency issues. It has now been moved into a separate WebWorker thread.
+
+    This complicates hacking on markdown-it a little bit, see the contribution guide for more information.
+
+-   Rewrite tree-sitter compatible highlighter
+
+    For a while now, highlighter was creating a TextEditor for each code block and then ripping the highlighted HTML from it. This didn't work well enough in some corner cases, and creating TextEditors is rather slow due to required DOM manipulation.
+
+    That code has been rewritten to use low-level internal Atom API, which makes it quite a bit faster and generally more robust. That said, future Atom versions might break something.
+
+-   Show preview error at the top of preview
+
+    It wasn't always evident that a preview error happened due to error message being added at the bottom of preview content. It is now added at the top.
+
+### New features
+
+-   Re-introduce legacy highlighter
+
+    Legacy highlighter only supports older TextMate-style grammars, but it is very well-tested. If the new highlighter algorithm breaks at some point, legacy highlighter offers a fallback option.
+
+    The active highlighter is controlled by the `markdown-preview-plus.previewConfig.highlighter` option.
+
+### Fixes
+
+-   Yield event loop periodically while highlighting to avoid UI freezes
+
+    This ensures UI doesn't freeze up completely if highlighting takes longer than expected. It also adds an upper limit on the time highlighter can work (currently hard-coded at 5 seconds).
+
+-   Skip over code block children when computing difference
+
+    Code blocks contain a lot of small stateless elements, and in general, we don't care how those are updated, so it makes sense to skip over those to speed up the diffing algorithm.
+
+### Maintenance
+
+-   Use babel to transpile TypeScript for faster builds
+-   Re-add static checks to CI
+-   Avoid error when searching for unprocesed math; report other errors
+
+## 4.4.1
+
+-   Fix MathJax update crash when diff algorithm is 'none'
+-   Remove old template.html
+
+## 4.4.0
+
+### New features
+
+-   More involved diffing algorithms
+
+    Added more involved diffing algorithms, and a new setting `markdown-preview-plus.previewConfig.diffMethod`, which can take values of `'none'`, `'heuristic'`, or `'myers'`. It is found in the settings UI as 'Diff Method' under 'Preview Behaviour'.
+
+    - `'none'` is the old method. Very fast, but doesn't handle insertions anywhere but the end of the document particularly gracefully.
+    - `'heuristic'` is a linear-complexity method that should produce slightly better results for common cases of insertion and deletion. It doesn't handle complete replacements particularly well though.
+    - `'myers'` uses Myers' longest common subsequence algorithm, which is very good at finding minimal sets of insertions and deletions, but in the worst case has near-quadratic complexity, so it can be very slow on large documents.
+
+    `'heuristic'` is the default.
+
+-   Command to move windowed preview back to Atom workspace
+
+    Windowed preview can be moved back inside the main Atom window using the context menu.
+
+-   Preview dynamic type change (file\/editor)
+
+    When the editor for the preview closes, and `markdown-preview-plus.previewConfig.closePreviewWithEditor` setting is disabled, preview will switch to monitoring the file automatically. If there is no file to monitor, it will instead "freeze" its state. This fixes issues with preview losing state over Atom restarts.
+
+### Changes
+
+-   Align preview post-update by the bottom of bottom visible element
+
+    Preview scroll position is now aligned with the bottom of the bottom-most visible element. This reduce the preview "jumping around" when the document is changed in the more common cases. Please open new issues if you observe undesirable behaviour wrt scroll position.
+
+    This is only done if `syncPreviewOnEditorScroll` (aka 'Sync preview position when text editor is scrolled') is disabled.
+
+-   Sync preview to scroll position on update if enabled
+
+    If `syncPreviewOnEditorScroll` (aka 'Sync preview position when text editor is scrolled') is enabled, sync preview to editor scroll position after update.
+
+-   Smoother scroll sync
+
+    Scroll synchronization is now using a weighted average position to determine the preview scroll position. It should generally result in smoother scrolling.
+
+### Fixes
+
+-   Avoid interleaving updates
+-   Optimize MathJax updates: reduce flicker
+-   Fix image flickering
+-   Cache editor text
+-   Fix scroll sync in windowed preview
+-   Various minor windowed preview fixes
+-   Don't show preview until the root element is drawn
+
+### Maintenance
+
+-   Update readme badges
+-   Fix specs
+-   Remove travis and appveyor CI
+-   Use static atom:\/\/ path for twemoji assets
+-   Simplify client IPC: Removed separate set-map command
+-   State deserialization for text-only previews
+-   Work around "loop limit exceeded" error
+-   Rename and move around some files
+
+## 4.3.0
+
+### New features
+
+-   New markdown-it plug-ins
+
+    Plug-ins that approximate features of Pandoc Markdown:
+
+    - attrs -- braced attributes
+    - bracketed-spans -- bracketed spans (with attributes)
+    - container -- fenced divs (with attributes)
+    - deflist -- definition lists
+    - front-matter -- YAML front-matter
+    - implicit-figures -- implicit figures with captions
+    - sub -- subscripts `~sub~`
+    - sup -- superscripts `^sup^`
+
+    Front-matter is enabled by default, others are disabled.
+
+-   Option to parse display math inline with markdown-it
+
+    Again, approximating Pandoc Markdown. Disabled by default.
+
+-   Add table captions parser
+
+    Approximating Pandoc Markdown. Can be enabled with markdown-it. Disabled by default.
+
+-   Set pandoc-like combination of markdown-it extensions when using pandoc
+
+    This will help with source/preview synchronization. Still by far not ideal, but hopefully at least a little better.
+
+### Fixes
+
+-   Careful-er inline math parsing
+-   Catch morphdom errors
+-   Don't let markdown-it re-parse LaTeX code inside math
+-   Fix #482 (very rare "Pane has been destroyed" error)
+-   Fix keybindings display in settings
+
+### Maintenance
+
+-   Bump dependencies
+-   Update table parser with latest changes from upstream
+-   Move custom markdown-it table parser to separate module
+
+## 4.2.0
+
+This is mostly a correcting release, but it has a couple new features,
+hence the minor version bump.
+
+### New features
+
+-   Convenience command\/menu item to open package settings page
+
+    Easier access to settings page.
+    `markdown-preview-plus:open-configuration` command or
+    Packages → Markdown Preview Plus → Open Package Configuration menu item.
+
+-   Add option to use native keyboard scroll in preview
+
+    The option is called `markdown-preview-plus.previewConfig.nativePageScrollKeys`, termed 'Use native scroll keys in preview' in UI in the 'Preview Behaviour' settings block.
+
+    This option is enabled by default to align better with how earlier versions behaved.
+
+    If the option is enabled, preview will use arrow keys, page up, page down, home, end and space for native navigation. The upside is smoother scroll behaviour. The downside is that these keys will be invisible to Atom when preview is focused, and hence can not be used in keymap with preview-focused commands. Also, unlike non-native commands, these are non-rebindable.
+
+### Fixes and Tweaks
+
+-   Never reparent webview
+
+    This fixes a few issues with preview flickering, reloading or becoming
+    empty after moving the pane around. However, this is achieved by drawing
+    preview over the top of the pane (as opposed to drawing it as a part of
+    the pane). Please report any visual glitches related to that.
+
+-   Make PgUp\/PgDn scroll by 90% of page height instead of 100%
+
+-   Fix findNext flicker
+
+-   Refactor preview search view
+
+-   Scroll webview on space
+
+    Makes space key behave as page down on preview.
+
+-   Disable webview pointer events on drag
+
+    Simplifies moving preview around
+
+-   Proxy webview keypresses instead of stealing focus
+
+    More intuitive preview focus behaviour
+
+-   Bridge the gap in functionality and behaviour between windowed and paned preview
+
+## 4.1.1
+
+-   Fuzzy whitespace search in search-selection-in-source
+
+## 4.1.0
+
+### New features
+
+-   Search selection in preview and source
+
+    Commands `markdown-preview-plus:search-selection-in-source` on Markdown Preview and `markdown-preview-plus:search-selection-in-preview` on Markdown Text Editor. Not bound to hotkeys by default. The former is available via the context menu.
+
+-   Find in preview
+
+    Commands `markdown-preview-plus:find-in-preview` and `markdown-preview-plus:find-next`, by default bound to `ctrl-f` (`cmd-f` on macOS) and `f3` respectively. Also available via context menu. Only activate when Markdown Preview is focused.
+
+-   Rich clipboard support when copying selection from preview
+
+    When copying selection from preview, some formatting will be kept via rich clipboard functionality. Bear in mind this is not as powerful as `markdown-preview-plus:copy-html` command.
+
+### Fixes
+
+-   Fixed some reloading issues; particularly when settings are changed with preview open or preview is moved to another pane.
+-   Fixed keybindings on preview
+
+## 4.0.1
+
+-   Fix require.resolve bundle issue
+
+    Path to twemoji-assets was not resolving correctly
+
+## 4.0.0
+
+**WARNING**: Potentially breaking changes.
+
+### Removed features
+
+-   Old "open in new window" has been removed. Due to a long-standing bug in Atom it wasn't working for a while, and it doesn't look like upstream is interested in fixing said bug.
+
+### New features
+
+-   BrowserWindow-based open in new window
+
+    BrowserWindow is relatively stable API on Electron 5, to which Atom updated in v1.48.0. Which makes it possible to re-introduce "open in new window" based on that.
+
+-   Add makePDF tree view command/menu item
+
+    A small convenience to create PDF from Markdown files straight from tree-view. Makes it possible to create PDFs "in bulk".
+
+    Added a context menu in tree-view called "Make PDF" and Atom command `markdown-preview-plus:make-pdf` bound to `.tree-view` selector. You can bind a key to this command with
+    ```cson
+    ".tree-view":
+      "<some-key>": "markdown-preview-plus:make-pdf"
+    ```
+    bear in mind this keybinding will only work when tree-view is focused and at least Markdown file is selected.
+
+-   Add menu item/command to edit LaTeX macros definitions
+
+    Added a small convenience command `markdown-preview-plus:edit-macros` and a main menu item Packages → Markdown Preview Plus → Edit LaTeX Macros, which open `.atom/markdown-preview-plus.yaml` in Atom.
+
+### Changes
+
+-   `markdown-preview-plus.cson` is now `markdown-preview-plus.yaml`. The conversion should in most cases happen automatically, but in rare cases you might need to do the conversion manually. Syntax is largely very similar if not outright the same.
+
+    This is not done lightly. However, CSON parsing requires a transient dependency on coffeescript, which bloats the size of dependencies and makes it unnecessarily hard to bundle the package.
+
+-   Markdown-preview-plus is now distributed in bundled form. This means installation and load times should be generally smaller. On the flip side, hacking on MPP is slightly more complicated. Check the [contribution guide](./CONTRIBUTING.md).
+
+-   MPP will use the TypeScript sources directly if Atom is started in dev-mode and some devDependencies are installed. This is relatively slow, so bear this in mind if using Atom's dev-mode.
+
+### Fixes
+
+-   Wait until pdf is actually created before continuing
+-   Make activation non-async
+-   Wait for load event on pdf save
+-   Make open-on-save configurable
+-   Do not render pandoc errors in saved\/copied documents
+
+### Maintenance
+
+-   Slightly rework how tree-view interaction is handled
+-   Bunlde simplified version of markdown-it-imsize in repo (issues with parcel in code that isn't even used)
+-   Dependencies updated
+
+## 3.11.5
+
+-   Rework source map builder, update spec
+-   Tweak highlighter editor initialization
+
+## 3.11.4
+
+-   Attempt at fixing #474
+
+## 3.11.3
+
+-   Fix save to PDF
+-   Force LF newlines in tsc output
+
+## 3.11.2
+
+-   Second attempt at fixing #472
+
+## 3.11.1
+
+-   First attempt at fixing #472
+-   Ignore `id` attribute on nodes in inline `svg` during differential updates
+
+    Oftentimes, nodes are moved around in inline SVG, especially if it's
+    generated by Pandoc filters, which leads to extremely messy results. So as
+    a band-aid measure, when updating nodes in inline SVG, node `id` is now
+    ignored.
+
+-   Removed old workaround for #386 and #406 due to being fixed in Atom
+-   Removed obsolete markmon copyright notice in update-preview
+-   Tweaks to morphdom update logic
+
+## 3.11.0
+
+-   Bump dependencies
+-   Present certain TOC rendering options to the user through Atom config ([#469](https://github.com/atom-community/markdown-preview-plus/pull/469)) ([@tanhevg](https://github.com/tanhevg))
+
+## 3.10.0
+
+-   Add a way to open preview for editor externally.
+-   Fix spec
+
+## 3.9.5
+
+-   Add twemoji assets as extra package
+
+    This should be a little more robust than bundling those in the repo.
+
+## 3.9.4
+
+-   Bundle twemoji svgs
+
+## 3.9.3
+
+-   Build
+-   Bump electron definitions
+-   Fix spec
+-   Remove extraneous console.logs
+-   Bump minimal Atom version to 1.39
+-   Changes to support Electron 3.1
+
 ## 3.9.2
 
 -   Revert "Changes to support Electron 3.1"

@@ -1,25 +1,25 @@
 {
-  "_from": "https://www.atom.io/api/packages/rails-snippets/versions/2.25.0/tarball",
-  "_id": "rails-snippets@2.25.0",
+  "_from": "https://www.atom.io/api/packages/rails-snippets/versions/2.26.0/tarball",
+  "_id": "rails-snippets@2.26.0",
   "_inBundle": false,
-  "_integrity": "sha512-DGzDuWlcD7e/LT+DHRxUb/R9G6hXVwIl+vejQCY60bp5YCGoX1P1B4wAsDyym7Xs3Igejt/EN/l8Fii0DeC+iQ==",
+  "_integrity": "sha512-pSONjNZ7MxAlvvhPoouqJ962biYKB1gmE48bN9eUXRZxrU0x95QTX3J81YefM+62I9v624IXpOn2YAe3ymrsVA==",
   "_location": "/rails-snippets",
   "_phantomChildren": {},
   "_requested": {
     "type": "remote",
-    "raw": "https://www.atom.io/api/packages/rails-snippets/versions/2.25.0/tarball",
-    "rawSpec": "https://www.atom.io/api/packages/rails-snippets/versions/2.25.0/tarball",
-    "saveSpec": "https://www.atom.io/api/packages/rails-snippets/versions/2.25.0/tarball",
-    "fetchSpec": "https://www.atom.io/api/packages/rails-snippets/versions/2.25.0/tarball"
+    "raw": "https://www.atom.io/api/packages/rails-snippets/versions/2.26.0/tarball",
+    "rawSpec": "https://www.atom.io/api/packages/rails-snippets/versions/2.26.0/tarball",
+    "saveSpec": "https://www.atom.io/api/packages/rails-snippets/versions/2.26.0/tarball",
+    "fetchSpec": "https://www.atom.io/api/packages/rails-snippets/versions/2.26.0/tarball"
   },
   "_requiredBy": [
     "#USER",
     "/"
   ],
-  "_resolved": "https://www.atom.io/api/packages/rails-snippets/versions/2.25.0/tarball",
-  "_shasum": "3287256d81288404fadb8d26217a042f351630b9",
-  "_spec": "https://www.atom.io/api/packages/rails-snippets/versions/2.25.0/tarball",
-  "_where": "/tmp/apm-install-dir-1191118-6930-1jnhp20.k80z",
+  "_resolved": "https://www.atom.io/api/packages/rails-snippets/versions/2.26.0/tarball",
+  "_shasum": "d4b693a617112f720edeb1f58995caee14a919b3",
+  "_spec": "https://www.atom.io/api/packages/rails-snippets/versions/2.26.0/tarball",
+  "_where": "/tmp/apm-install-dir-2020614-17215-1lgnl3s.p7yc",
   "activationCommands": {
     "atom-text-editor": [
       "rails-snippets:toggleErb"
@@ -54,5 +54,5 @@
     "controller",
     "forms"
   ],
-  "version": "2.25.0"
+  "version": "2.26.0"
 }

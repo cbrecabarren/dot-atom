@@ -1,63 +1,92 @@
-import path = require('path')
-import { Emitter, Disposable, CompositeDisposable, Grammar } from 'atom'
+import * as path from 'path'
+import { Emitter, Disposable, CompositeDisposable, Grammar, Range } from 'atom'
 import { debounce } from 'lodash'
-import fs = require('fs')
+import * as fs from 'fs'
+import { remote } from 'electron'
 
-import renderer = require('../renderer')
-import markdownIt = require('../markdown-it-helper')
+import * as renderer from '../renderer'
+import { MarkdownItWorker } from '../markdown-it-helper'
 import { handlePromise, copyHtml, atomConfig } from '../util'
 import * as util from './util'
 import { WebviewHandler } from './webview-handler'
-import { ImageWatcher } from '../image-watch-helper'
 import { saveAsPDF } from './pdf-export-util'
 import { loadUserMacros } from '../macros-util'
+import { WebContentsHandler } from './web-contents-handler'
+import { modalTextEditorView } from '../modal-text-editor-view'
+import { BrowserWindowHandler } from './browserwindow-handler'
+import {
+  MarkdownPreviewController,
+  MarkdownPreviewControllerEditor,
+  MarkdownPreviewControllerFile,
+  MarkdownPreviewControllerText,
+  SerializedMPV,
+} from './controller'
+import { openPreviewPane } from './helpers'
 
-export interface SerializedMPV {
-  deserializer: 'markdown-preview-plus/MarkdownPreviewView'
-  editorId?: number
-  filePath?: string
-}
+export type { SerializedMPV }
 
-export abstract class MarkdownPreviewView {
+export class MarkdownPreviewView {
   private static elementMap = new WeakMap<HTMLElement, MarkdownPreviewView>()
-
-  public readonly renderPromise: Promise<void>
-  public runJS!: MarkdownPreviewView['handler']['runJS']
-  protected handler!: WebviewHandler
-  public get element(): HTMLElement {
-    return this.handler.element
+  // used for tests
+  public get type() {
+    return this.controller.type
   }
+  public readonly element: HTMLElement
   protected emitter: Emitter<{
     'did-change-title': undefined
     'did-change-markdown': undefined
+    'did-init': undefined
+    'did-destroy': undefined
   }> = new Emitter()
   protected disposables = new CompositeDisposable()
+  protected controllerDisposables?: CompositeDisposable
   protected destroyed = false
+  protected readonly handler: WebContentsHandler
   private loading: boolean = true
-  private imageWatcher!: ImageWatcher
+  private _initialRenderPromsie: Promise<void>
 
-  protected constructor(
+  constructor(
+    private controller: MarkdownPreviewController,
     private renderLaTeX: boolean = atomConfig().mathConfig
       .enableLatexRenderingByDefault,
+    handlerConstructor: new (
+      x: () => Promise<void>,
+    ) => WebContentsHandler = WebviewHandler,
   ) {
-    this.renderPromise = new Promise((resolve) => {
-      this.handler = new WebviewHandler(() => {
-        const config = atomConfig()
-        this.handler.init({
-          userMacros: loadUserMacros(),
-          mathJaxConfig: config.mathConfig,
-          context: 'live-preview',
-        })
-        this.handler.setBasePath(this.getPath())
-        this.emitter.emit('did-change-title')
-        resolve(this.renderMarkdown())
+    this.handler = new handlerConstructor(async () => {
+      const config = atomConfig()
+      await this.handler.init({
+        userMacros: loadUserMacros(),
+        mathJaxConfig: config.mathConfig,
+        context: 'live-preview',
       })
-      this.runJS = this.handler.runJS.bind(this.handler)
-      this.imageWatcher = new ImageWatcher(
-        this.handler.updateImages.bind(this.handler),
+      await this.handler.setBasePath(this.getPath())
+      await this.handler.setNativeKeys(
+        config.previewConfig.nativePageScrollKeys,
       )
-      MarkdownPreviewView.elementMap.set(this.element, this)
+      this.emitter.emit('did-change-title')
+      this.emitter.emit('did-init')
     })
+    this.element = document.createElement('div')
+    this.element.tabIndex = -1
+    this.element.classList.add('markdown-preview-plus')
+    MarkdownPreviewView.elementMap.set(this.element, this)
+    this.subscribeController()
+    this._initialRenderPromsie = new Promise((resolve) => {
+      this.disposables.add(
+        this.emitter.on('did-init', () => {
+          handlePromise(
+            this.renderMarkdown().then(() => {
+              this.loading = false
+              resolve()
+            }),
+          )
+        }),
+      )
+    })
+    if (this.handler.element) this.element.appendChild(this.handler.element)
+    this.handler.registerViewEvents(this)
+    this.disposables.add(this.handler.onDidDestroy(() => this.destroy()))
     this.handleEvents()
   }
 
@@ -65,15 +94,31 @@ export abstract class MarkdownPreviewView {
     return MarkdownPreviewView.elementMap.get(element)
   }
 
-  public abstract serialize(): SerializedMPV
+  public serialize(): SerializedMPV {
+    return this.controller.serialize()
+  }
 
   public destroy() {
     if (this.destroyed) return
     this.destroyed = true
-    this.imageWatcher.dispose()
+    this.emitter.emit('did-destroy')
     this.disposables.dispose()
+    this.controller.destroy()
     this.handler.destroy()
     MarkdownPreviewView.elementMap.delete(this.element)
+    this.element.remove()
+  }
+
+  public onDidDestroy(callback: () => void) {
+    return this.emitter.on('did-destroy', callback)
+  }
+
+  public async runJS<T>(js: string) {
+    return this.handler.runJS<T>(js)
+  }
+
+  public async initialRenderPromise() {
+    await this._initialRenderPromsie
   }
 
   public onDidChangeTitle(callback: () => void): Disposable {
@@ -89,7 +134,9 @@ export abstract class MarkdownPreviewView {
     this.changeHandler()
   }
 
-  public abstract getTitle(): string
+  public getTitle(): string {
+    return this.controller.getTitle()
+  }
 
   public getDefaultLocation(): 'left' | 'right' | 'bottom' | 'center' {
     return atomConfig().previewConfig.previewDock
@@ -99,9 +146,13 @@ export abstract class MarkdownPreviewView {
     return 'markdown'
   }
 
-  public abstract getURI(): string
+  public getURI(): string {
+    return this.controller.getURI()
+  }
 
-  public abstract getPath(): string | undefined
+  public getPath(): string | undefined {
+    return this.controller.getPath()
+  }
 
   public getSaveDialogOptions() {
     let defaultPath = this.getPath()
@@ -124,15 +175,18 @@ export abstract class MarkdownPreviewView {
 
     if (ext === '.pdf') {
       handlePromise(
-        this.getMarkdownSource().then(async (mdSource) =>
-          saveAsPDF(
+        this.getMarkdownSource().then(async (mdSource) => {
+          await saveAsPDF(
             mdSource,
             this.getPath(),
             this.getGrammar(),
             this.renderLaTeX,
             filePath,
-          ),
-        ),
+          )
+          if (atomConfig().saveConfig.openOnSave.pdf) {
+            return atom.workspace.open(filePath)
+          } else return undefined
+        }),
       )
     } else {
       handlePromise(
@@ -145,14 +199,36 @@ export abstract class MarkdownPreviewView {
           )
 
           fs.writeFileSync(filePath, fullHtml)
-          return atom.workspace.open(filePath)
+          if (atomConfig().saveConfig.openOnSave.html) {
+            return atom.workspace.open(filePath)
+          } else return undefined
         }),
       )
     }
   }
 
-  protected didScrollPreview(_min: number, _max: number) {
-    /* noop, implementation in editor preview */
+  public openMainWindow(): void {
+    const ctrl = this.createNewFromThis(WebviewHandler)
+    handlePromise(openPreviewPane(ctrl))
+    util.destroy(this)
+  }
+
+  protected openNewWindow(): void {
+    const ctrl = this.createNewFromThis(BrowserWindowHandler)
+    atom.views.getView(atom.workspace).appendChild(ctrl.element)
+    util.destroy(this)
+  }
+
+  protected createNewFromThis(
+    handler: new (x: () => Promise<void>) => WebContentsHandler,
+  ) {
+    const curController = this.controller
+    // this will get destroyed shortly, but we create it for consistency
+    this.controller = new MarkdownPreviewControllerText(
+      this.getMarkdownSource(),
+    )
+    this.subscribeController()
+    return new MarkdownPreviewView(curController, this.renderLaTeX, handler)
   }
 
   protected changeHandler = () => {
@@ -164,38 +240,32 @@ export abstract class MarkdownPreviewView {
     }
   }
 
-  protected abstract async getMarkdownSource(): Promise<string>
-
-  protected abstract getGrammar(): Grammar | undefined
-
-  protected openSource(initialLine?: number) {
-    const path = this.getPath()
-    if (path === undefined) return
-    handlePromise(
-      atom.workspace.open(path, {
-        initialLine,
-        searchAllPanes: true,
-      }),
-    )
+  protected async getMarkdownSource(): Promise<string> {
+    return this.controller.getMarkdownSource()
   }
 
-  protected syncPreview(line: number, flash: boolean) {
-    this.handler.sync(line, flash)
+  protected getGrammar(): Grammar | undefined {
+    return this.controller.getGrammar()
   }
 
-  protected openNewWindow() {
+  protected async openSource(initialLine?: number) {
     const path = this.getPath()
-    if (!path) {
-      atom.notifications.addWarning(
-        'Can not open this preview in new window: no file path',
-      )
-      return
-    }
-    atom.open({
-      pathsToOpen: [`markdown-preview-plus://file/${path}`],
-      newWindow: true,
+    if (path === undefined) return undefined
+    const ed = await atom.workspace.open(path, {
+      initialLine,
+      searchAllPanes: true,
     })
-    util.destroy(this)
+    if (!atom.workspace.isTextEditor(ed)) return undefined
+    if (this.controller.type !== 'editor') {
+      this.controller.destroy()
+      this.controller = new MarkdownPreviewControllerEditor(ed)
+      this.subscribeController()
+    }
+    return ed
+  }
+
+  protected async syncPreview(line: number, flash: boolean) {
+    return this.handler.sync(line, flash)
   }
 
   private handleEvents() {
@@ -212,32 +282,77 @@ export abstract class MarkdownPreviewView {
         }, 250),
       ),
       atom.commands.add(this.element, {
-        'core:move-up': () => this.element.scrollBy({ top: -10 }),
-        'core:move-down': () => this.element.scrollBy({ top: 10 }),
+        'core:move-up': () =>
+          this.handler.runJS('window.scrollBy({top:-30, behavior: "auto"})'),
+        'core:move-down': () =>
+          this.handler.runJS('window.scrollBy({top:30, behavior: "auto"})'),
+        'core:move-left': () =>
+          this.handler.runJS('window.scrollBy({left:-30, behavior: "auto"})'),
+        'core:move-right': () =>
+          this.handler.runJS('window.scrollBy({left:-30, behavior: "auto"})'),
+        'core:page-up': () =>
+          this.handler.runJS(
+            'window.scrollBy({top:-0.9*window.innerHeight, behavior: "auto"})',
+          ),
+        'core:page-down': () =>
+          this.handler.runJS(
+            'window.scrollBy({top:0.9*window.innerHeight, behavior: "auto"})',
+          ),
+        'core:move-to-top': () =>
+          this.handler.runJS(
+            'window.scrollBy({top:-document.body.scrollHeight, behavior: "smooth"})',
+          ),
+        'core:move-to-bottom': () =>
+          this.handler.runJS(
+            'window.scrollBy({top:document.body.scrollHeight, behavior: "smooth"})',
+          ),
+        'core:cancel': (evt) => {
+          if (this.handler.hasSearch()) handlePromise(this.handler.stopSearch())
+          else evt.abortKeyBinding()
+        },
         'core:copy': () => {
           handlePromise(this.copyToClipboard())
         },
         'markdown-preview-plus:open-dev-tools': () => {
-          this.handler.openDevTools()
+          handlePromise(this.handler.openDevTools())
         },
         'markdown-preview-plus:new-window': () => {
           this.openNewWindow()
         },
         'markdown-preview-plus:print': () => {
-          this.handler.print()
+          handlePromise(this.handler.print())
         },
         'markdown-preview-plus:zoom-in': () => {
-          this.handler.zoomIn()
+          handlePromise(this.handler.zoomIn())
         },
         'markdown-preview-plus:zoom-out': () => {
-          this.handler.zoomOut()
+          handlePromise(this.handler.zoomOut())
         },
         'markdown-preview-plus:reset-zoom': () => {
-          this.handler.resetZoom()
+          handlePromise(this.handler.resetZoom())
         },
-        'markdown-preview-plus:sync-source': async (_event) => {
-          const line = await this.handler.syncSource()
-          this.openSource(line)
+        'markdown-preview-plus:sync-source': (_event) => {
+          handlePromise(
+            this.handler.syncSource().then((line) => this.openSource(line)),
+          )
+        },
+        'markdown-preview-plus:search-selection-in-source': () => {
+          handlePromise(this.searchSelectionInSource())
+        },
+        'markdown-preview-plus:find-next': () => {
+          handlePromise(this.handler.findNext())
+        },
+        'markdown-preview-plus:find-in-preview': () => {
+          const cw = remote.getCurrentWindow()
+          const fw = remote.BrowserWindow.getFocusedWindow()
+          if (fw !== cw) cw.focus()
+          handlePromise(
+            modalTextEditorView('Find in preview').then((text) => {
+              if (fw && fw !== cw) fw.focus()
+              if (!text) return undefined
+              return this.handler.search(text)
+            }),
+          )
         },
       }),
       atom.config.onDidChange('markdown-preview-plus.markdownItConfig', () => {
@@ -248,43 +363,34 @@ export abstract class MarkdownPreviewView {
       }),
       atom.config.onDidChange(
         'markdown-preview-plus.mathConfig.latexRenderer',
-        () => {
-          handlePromise(this.handler.reload())
-        },
+        () => handlePromise(this.handler.reload()),
       ),
       atom.config.onDidChange(
         'markdown-preview-plus.mathConfig.numberEquations',
-        () => {
-          handlePromise(this.handler.reload())
-        },
+        () => handlePromise(this.handler.reload()),
+      ),
+      atom.config.onDidChange(
+        'markdown-preview-plus.previewConfig.nativePageScrollKeys',
+        ({ newValue }) => handlePromise(this.handler.setNativeKeys(newValue)),
       ),
       atom.config.onDidChange(
         'markdown-preview-plus.renderer',
         this.changeHandler,
       ),
-      atom.config.onDidChange('markdown-preview-plus.useGitHubStyle', () => {
-        this.handler.updateStyles()
-      }),
-      atom.config.onDidChange('markdown-preview-plus.syntaxThemeName', () => {
-        this.handler.updateStyles()
-      }),
       atom.config.onDidChange(
-        'markdown-preview-plus.importPackageStyles',
-        () => {
-          this.handler.updateStyles()
-        },
+        'markdown-preview-plus.previewConfig.highlighter',
+        this.changeHandler,
       ),
 
       // webview events
       this.handler.emitter.on('did-scroll-preview', ({ min, max }) => {
-        this.didScrollPreview(min, max)
+        this.controller.didScrollPreview(min, max)
       }),
     )
   }
 
   private async renderMarkdown(): Promise<void> {
-    const source = await this.getMarkdownSource()
-    await this.renderMarkdownText(source)
+    return this.renderMarkdownText(await this.getMarkdownSource())
   }
 
   private async getHTMLToSave(savePath: string) {
@@ -294,6 +400,7 @@ export abstract class MarkdownPreviewView {
       filePath: this.getPath(),
       grammar: this.getGrammar(),
       renderLaTeX: this.renderLaTeX,
+      renderErrors: false,
       mode: 'save',
       savePath,
     })
@@ -306,26 +413,32 @@ export abstract class MarkdownPreviewView {
         filePath: this.getPath(),
         grammar: this.getGrammar(),
         renderLaTeX: this.renderLaTeX,
+        renderErrors: true,
         mode: 'normal',
-        imageWatcher: this.imageWatcher,
+        imageWatcher: this.handler.imageWatcher,
       })
 
       if (this.destroyed) return
-      this.loading = false
       await this.handler.update(
         domDocument.documentElement!.outerHTML,
         this.renderLaTeX,
-      )
-      this.handler.setSourceMap(
-        util.buildLineMap(markdownIt.getTokens(text, this.renderLaTeX)),
+        atomConfig().previewConfig.diffMethod,
+        util.buildLineMap(
+          domDocument.querySelector('[data-pos]')
+            ? domDocument
+            : await MarkdownItWorker.getTokens(text, this.renderLaTeX),
+        ),
+        atomConfig().syncConfig.syncPreviewOnEditorScroll
+          ? this.controller.getScrollSyncParams()
+          : undefined,
       )
       this.emitter.emit('did-change-markdown')
     } catch (error) {
-      this.showError(error as Error)
+      await this.showError(error as Error)
     }
   }
 
-  private showError(error: Error) {
+  private async showError(error: Error) {
     if (this.destroyed) {
       atom.notifications.addFatalError(
         'Error reported on a destroyed Markdown Preview Plus view',
@@ -336,16 +449,111 @@ export abstract class MarkdownPreviewView {
         },
       )
       return
+    } else if (this.loading) {
+      atom.notifications.addFatalError(
+        'Error reported when Markdown Preview Plus view is loading',
+        {
+          dismissable: true,
+          stack: error.stack,
+          detail: error.message,
+        },
+      )
+      return
+    } else {
+      return this.handler.error(error.message)
     }
-    this.handler.error(error.message)
   }
 
   private async copyToClipboard(): Promise<void> {
-    await this.renderPromise
     const selection = await this.handler.getSelection()
-    // Use default copy event handler if there is selected text inside this view
-    if (selection !== undefined) return
-    const src = await this.getMarkdownSource()
-    await copyHtml(src, this.getPath(), this.renderLaTeX)
+    // Use stupid copy event handler if there is selected text inside this view
+    if (selection !== undefined) {
+      if (atom.config.get('markdown-preview-plus.richClipboard')) {
+        await this.handler.runJS('document.execCommand("copy")')
+      } else {
+        atom.clipboard.write(selection)
+      }
+    } else {
+      const src = await this.getMarkdownSource()
+      await copyHtml(src, this.getPath(), this.renderLaTeX)
+    }
+  }
+
+  private async searchSelectionInSource() {
+    const text = await this.handler.getSelection()
+    if (!text) return
+    const editor = await this.openSource()
+    if (!editor) return
+    const rxs = text
+      .replace(/[\/\\^$*+?.()|[\]{}]/g, '\\$&')
+      .replace(/\n+$/, '')
+      .replace(/\s+/g, '\\s+')
+    const rx = new RegExp(rxs)
+    let found = false
+    editor.scanInBufferRange(
+      rx,
+      new Range(
+        editor.getCursors()[0].getBufferPosition(),
+        editor.getBuffer().getRange().end,
+      ),
+      (it) => {
+        editor.scrollToBufferPosition(it.range.start)
+        editor.setSelectedBufferRange(it.range)
+        found = true
+        it.stop()
+      },
+    )
+    if (found) return
+    editor.scan(rx, (it) => {
+      editor.scrollToBufferPosition(it.range.start)
+      editor.setSelectedBufferRange(it.range)
+      it.stop()
+    })
+  }
+
+  private subscribeController() {
+    if (this.controllerDisposables) {
+      this.disposables.remove(this.controllerDisposables)
+      this.controllerDisposables.dispose()
+    }
+    this.controllerDisposables = new CompositeDisposable()
+    this.disposables.add(this.controllerDisposables)
+    this.controllerDisposables.add(
+      this.controller.onDidChange(this.changeHandler),
+      this.controller.onDidChangePath((path) => {
+        handlePromise(this.handler.setBasePath(path))
+        this.emitter.emit('did-change-title')
+      }),
+      this.controller.onDidDestroy(() => {
+        if (atomConfig().previewConfig.closePreviewWithEditor) {
+          util.destroy(this)
+        } else {
+          const path = this.controller.getPath()
+          if (path) {
+            this.controller = new MarkdownPreviewControllerFile(path)
+          } else {
+            this.controller = new MarkdownPreviewControllerText(
+              this.controller.getMarkdownSource(),
+            )
+          }
+          this.subscribeController()
+        }
+      }),
+      this.controller.onActivate((edPane) => {
+        const pane = atom.workspace.paneForItem(this)
+        if (!pane) return
+        if (pane === edPane) return
+        pane.activateItem(this)
+      }),
+      this.controller.onScrollSync(({ firstLine, lastLine }) => {
+        handlePromise(this.handler.scrollSync(firstLine, lastLine))
+      }),
+      this.controller.onSearch((text) => {
+        handlePromise(this.handler.search(text))
+      }),
+      this.controller.onSync(([pos, flash]) => {
+        handlePromise(this.syncPreview(pos, flash))
+      }),
+    )
   }
 }

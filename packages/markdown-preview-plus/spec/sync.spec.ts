@@ -1,9 +1,9 @@
 import * as path from 'path'
+import * as fs from 'fs'
 import * as temp from 'temp'
-import * as cson from 'season'
-import * as markdownIt from '../lib/markdown-it-helper'
-import { MarkdownPreviewView } from '../lib/markdown-preview-view'
-import * as sinon from 'sinon'
+import * as yaml from 'yaml'
+import { MarkdownItWorker } from '../src/markdown-it-helper'
+import { MarkdownPreviewView } from '../src/markdown-preview-view'
 import {
   waitsFor,
   expectPreviewInSplitPane,
@@ -12,8 +12,7 @@ import {
   sinonPrivateSpy,
 } from './util'
 import { expect } from 'chai'
-import Token = require('markdown-it/lib/token')
-import * as previewUtil from '../lib/markdown-preview-view/util'
+import * as previewUtil from '../src/markdown-preview-view/util'
 import {} from 'electron'
 
 temp.track()
@@ -23,20 +22,15 @@ interface MyToken {
   line: number
 }
 
-describe('Syncronization of source and preview', function() {
+describe('Syncronization of source and preview', function () {
   let preview: MarkdownPreviewView
   let fixturesPath: string
-  let stub: sinon.SinonStub
 
   before(async () => activateMe())
   after(async () => atom.packages.deactivatePackage('markdown-preview-plus'))
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     fixturesPath = path.join(__dirname, 'fixtures')
-
-    // Redirect atom to a temp config directory
-    const configDirPath = temp.mkdirSync('atom-config-dir-')
-    stub = sinon.stub(atom, 'getConfigDirPath').returns(configDirPath)
 
     atom.config.set(
       'markdown-preview-plus.mathConfig.enableLatexRenderingByDefault',
@@ -59,8 +53,7 @@ describe('Syncronization of source and preview', function() {
     )
   })
 
-  afterEach(async function() {
-    stub.restore()
+  afterEach(async function () {
     atom.config.unset('markdown-preview-plus')
     for (const item of atom.workspace.getPaneItems()) {
       const pane = atom.workspace.paneForItem(item)
@@ -69,7 +62,8 @@ describe('Syncronization of source and preview', function() {
   })
 
   function findInPreview(token: MyToken) {
-    let el = preview.element.querySelector('.update-preview')
+    expect(preview.element).not.to.be.undefined
+    let el = preview.element!.querySelector('.update-preview')
     for (const element of token.path) {
       if (!el) {
         break
@@ -79,15 +73,17 @@ describe('Syncronization of source and preview', function() {
     return el
   }
 
-  describe('Syncronizing preview with source', function() {
+  describe('Syncronizing preview with source', function () {
     let sourceMap: MyToken[]
-    let tokens: Token[]
+    let tokens: string
 
-    beforeEach(function() {
-      sourceMap = cson.readFileSync(
-        path.join(fixturesPath, 'sync-preview.cson'),
+    beforeEach(async function () {
+      sourceMap = yaml.parse(
+        fs.readFileSync(path.join(fixturesPath, 'sync-preview.yaml'), {
+          encoding: 'utf-8',
+        }),
       ) as MyToken[]
-      tokens = markdownIt.getTokens(
+      tokens = await MarkdownItWorker.getTokens(
         atom.workspace.getActiveTextEditor()!.getText(),
         true,
       )
@@ -95,12 +91,23 @@ describe('Syncronization of source and preview', function() {
 
     it('identifies the correct HTMLElement path', () => {
       const elementPaths = previewUtil.buildLineMap(tokens)
+      // const out = []
+      // for (const [line, path] of Object.entries(elementPaths)) {
+      //   out.push({ line: parseInt(line, 10), path })
+      // }
+      // console.log(cson.stringify(out))
       for (const sourceLine of sourceMap) {
         if (sourceLine.path.length === 0) continue
         const elementPath = elementPaths[sourceLine.line]
         elementPath.forEach((_x, i) => {
-          expect(elementPath[i].tag).to.equal(sourceLine.path[i].tag)
-          expect(elementPath[i].index).to.equal(sourceLine.path[i].index)
+          expect(elementPath[i].tag).to.equal(
+            sourceLine.path[i].tag,
+            `On line ${sourceLine.line} expected tag at ${i} to match`,
+          )
+          expect(elementPath[i].index).to.equal(
+            sourceLine.path[i].index,
+            `On line ${sourceLine.line} expected index at ${i} to match`,
+          )
         })
       }
     })
@@ -131,9 +138,11 @@ describe('Syncronization of source and preview', function() {
   })
 
   describe('Syncronizing source with preview', () =>
-    it('sets the editors cursor buffer location to the correct line', function() {
-      const sourceMap = cson.readFileSync(
-        path.join(fixturesPath, 'sync-source.cson'),
+    it('sets the editors cursor buffer location to the correct line', function () {
+      const sourceMap = yaml.parse(
+        fs.readFileSync(path.join(fixturesPath, 'sync-source.yaml'), {
+          encoding: 'utf-8',
+        }),
       ) as Array<MyToken>
 
       for (const sourceElement of sourceMap) {
@@ -141,8 +150,9 @@ describe('Syncronization of source and preview', function() {
         if (!element) {
           continue
         }
+        expect(preview.element).not.to.be.undefined
         atom.commands.dispatch(
-          preview.element,
+          preview.element!,
           'markdown-preview-plus:sync-source',
         )
         const syncLine = atom.workspace

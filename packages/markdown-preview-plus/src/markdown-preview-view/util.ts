@@ -1,8 +1,7 @@
 import { TextEditor } from 'atom'
 import * as path from 'path'
 import * as fs from 'fs'
-import Token = require('markdown-it/lib/token')
-import { handlePromise, atomConfig } from '../util'
+import { handlePromise, atomConfig, packagePath } from '../util'
 
 export function editorForId(editorId: number): TextEditor | undefined {
   for (const editor of atom.workspace.getTextEditors()) {
@@ -11,13 +10,6 @@ export function editorForId(editorId: number): TextEditor | undefined {
     }
   }
   return undefined
-}
-
-// this weirdness allows overriding in tests
-let getStylesOverride: typeof getPreviewStyles | undefined = undefined
-
-export function __setGetStylesOverride(f?: typeof getPreviewStyles) {
-  getStylesOverride = f
 }
 
 function* getStyles(context?: string | null): IterableIterator<string> {
@@ -32,7 +24,7 @@ function* getStyles(context?: string | null): IterableIterator<string> {
 
 function getClientStyle(file: string): string {
   return atom.themes.loadStylesheet(
-    path.join(__dirname, '..', '..', 'styles-client', `${file}.less`),
+    path.join(packagePath(), 'styles-client', `${file}.less`),
   )
 }
 
@@ -76,7 +68,9 @@ function* getActivePackageStyles(
 }
 
 export function getPreviewStyles(display: boolean): string[] {
-  if (getStylesOverride) return getStylesOverride(display)
+  if (window['markdown-preview-plus-tests']?.getStylesOverride) {
+    return window['markdown-preview-plus-tests']?.getStylesOverride(display)
+  }
   const styles = []
   if (display) {
     // global editor styles
@@ -133,92 +127,58 @@ function getMarkdownPreviewCSS() {
 
   return getPreviewStyles(false)
     .join('\n')
-    .replace(cssUrlRefExp, function(
+    .replace(cssUrlRefExp, function (
       _match,
       assetsName: string,
       _offset,
       _string,
     ) {
       // base64 encode assets
-      const assetPath = path.join(__dirname, '../../assets', assetsName)
+      const assetPath = path.join(packagePath(), 'assets', assetsName)
       const originalData = fs.readFileSync(assetPath, 'binary')
-      const base64Data = new Buffer(originalData, 'binary').toString('base64')
+      const base64Data = Buffer.from(originalData, 'binary').toString('base64')
       return `url('data:image/jpeg;base64,${base64Data}')`
     })
 }
 
-//
-// Decode tags used by markdown-it
-//
-// @param {markdown-it.Token} token Decode the tag of token.
-// @return {string|null} Decoded tag or `null` if the token has no tag.
-//
-function decodeTag(token: Token): string | null {
-  if (token.tag === 'math') {
-    return 'span'
+export function buildLineMap(html: string | Document) {
+  let dom: Document
+  if (typeof html === 'string') {
+    const domparser = new DOMParser()
+    dom = domparser.parseFromString(html, 'text/html')
+  } else {
+    dom = html
   }
-  if (token.tag === 'code') {
-    return 'atom-text-editor'
-  }
-  if (token.tag === '') {
-    return null
-  }
-  return token.tag
-}
 
-//
-// Determine path to a target token.
-//
-// @param {(markdown-it.Token)[]} tokens Array of tokens as returned by
-//   `markdown-it.parse()`.
-// @param {number} line Line representing the target token.
-// @return {(tag: <tag>, index: <index>)[]} Array representing a path to the
-//   target token. The root token is represented by the first element in the
-//   array and the target token by the last elment. Each element consists of a
-//   `tag` and `index` representing its index amongst its sibling tokens in
-//   `tokens` of the same `tag`. `line` will lie between the properties
-//   `map[0]` and `map[1]` of the target token.
-//
-export function buildLineMap(tokens: ReadonlyArray<Readonly<Token>>) {
-  const lineMap: { [line: number]: Array<{ tag: string; index: number }> } = {}
-  const tokenTagCount: { [line: number]: { [tag: string]: number } } = {}
-  tokenTagCount[0] = {}
-
-  for (const token of tokens) {
-    if (token.hidden) continue
-    // tslint:disable-next-line:strict-type-predicates // TODO: complain on DT
-    if (token.map == null) continue
-
-    const tag = decodeTag(token)
-    if (tag === null) continue
-
-    if (token.nesting === 1) {
-      // opening tag
-      for (let line = token.map[0]; line < token.map[1]; line += 1) {
-        // tslint:disable-next-line:strict-type-predicates
-        if (lineMap[line] == null) lineMap[line] = []
-        lineMap[line].push({
-          tag: tag,
-          index: tokenTagCount[token.level][tag] || 0,
-        })
+  const map: { [line: number]: { tag: string; index: number }[] } = {}
+  for (const elem of Array.from(
+    dom.querySelectorAll(`[data-source-lines],[data-pos]`),
+  )) {
+    const he = elem as HTMLElement
+    const [start, end] = he.dataset.sourceLines
+      ? he.dataset.sourceLines.split(' ').map((x) => parseInt(x, 10))
+      : he.dataset
+          .pos!.slice(1)
+          .split('-')
+          .map((x) => parseInt(x.split(':')[0], 10) - 1)
+    if (!start || !end) continue
+    let e: Element | null = elem
+    const path = []
+    while (e && e.tagName !== 'BODY') {
+      let index = 0
+      let sib: Element = e
+      while (sib.previousElementSibling) {
+        sib = sib.previousElementSibling
+        if (sib.tagName === e.tagName) index++
       }
-      tokenTagCount[token.level + 1] = {}
-    } else if (token.nesting === 0) {
-      // self-closing tag
-      for (let line = token.map[0]; line < token.map[1]; line += 1) {
-        // tslint:disable-next-line:strict-type-predicates
-        if (lineMap[line] == null) lineMap[line] = []
-        lineMap[line].push({
-          tag: tag,
-          index: tokenTagCount[token.level][tag] || 0,
-        })
-      }
+      path.unshift({ tag: e.tagName.toLowerCase(), index })
+      e = e.parentElement
     }
-    const ttc = tokenTagCount[token.level][tag]
-    tokenTagCount[token.level][tag] = ttc ? ttc + 1 : 1
+    for (let i = start; i < end; ++i) {
+      if (!map[i] || map[i].length <= path.length) map[i] = path
+    }
   }
-
-  return lineMap
+  return map
 }
 
 function mathJaxScript(texConfig: MathJax.TeXInputProcessor) {
@@ -270,7 +230,8 @@ ${html.head!.innerHTML}
 ` // Ensure trailing newline
 }
 
-export function destroy(item: object) {
+export function destroy(item: { destroy(): void }) {
   const pane = atom.workspace.paneForItem(item)
   if (pane) handlePromise(pane.destroyItem(item))
+  else item.destroy()
 }

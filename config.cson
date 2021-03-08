@@ -12,6 +12,7 @@
       "metrics"
       "spell-check"
       "markdown-preview"
+      "react"
     ]
     packagesWithKeymapsDisabled: [
       "snippets"
@@ -19,7 +20,7 @@
     telemetryConsent: "no"
     themes: [
       "atom-dark-ui"
-      "railscast-theme"
+      "atom-dark-syntax"
     ]
     useReactEditor: true
   date:
@@ -28,7 +29,7 @@
     timeFormat: "HH:mm:ss"
   editor:
     fontFamily: "Consolas"
-    fontSize: 12
+    fontSize: 13
     invisibles: {}
     scrollPastEnd: true
     showIndentGuide: true
@@ -36,6 +37,8 @@
     softWrap: true
   "exception-reporting":
     userId: "3fb58b1f-bdd2-adab-efb8-2975dc6c23e4"
+  "highlight-colors":
+    highlightCssNamedColors: false
   "julia-client":
     enableMenu: true
     firstBoot: false
@@ -50,6 +53,8 @@
   "release-notes":
     viewedVersion: "0.94.0"
   "split-diff": {}
+  "svg-preview":
+    openPreviewAutomatically: true
   "tool-bar": {}
   "uber-juno":
     disable: true

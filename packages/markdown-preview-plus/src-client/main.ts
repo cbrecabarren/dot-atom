@@ -1,25 +1,31 @@
 import { ipcRenderer } from 'electron'
-import { UpdatePreview } from './update-preview'
+import { update } from './update-preview'
 import { MathJaxController, processHTMLString } from './mathjax-helper'
 import * as util from './util'
 import { getMedia } from '../src/util-common'
+import { ChannelMap } from './ipc'
+
+let handlerId: number
+let nativePageScrollKeys = false
+
+function uncaughtError(err: Error) {
+  ipcRenderer.send<'atom-markdown-preview-plus-ipc-uncaught-error'>(
+    'atom-markdown-preview-plus-ipc-uncaught-error',
+    handlerId,
+    {
+      message: err.message,
+      name: err.name,
+      stack: err.stack,
+    },
+  )
+}
 
 window.addEventListener('error', (e) => {
-  const err = e.error as Error
-  ipcRenderer.sendToHost<'uncaught-error'>('uncaught-error', {
-    message: err.message,
-    name: err.name,
-    stack: err.stack,
-  })
+  uncaughtError(e.error as Error)
 })
 
 window.addEventListener('unhandledrejection', (evt) => {
-  const err = (evt as any).reason as Error
-  ipcRenderer.sendToHost<'uncaught-error'>('uncaught-error', {
-    message: err.message,
-    name: err.name,
-    stack: err.stack,
-  })
+  uncaughtError((evt as any).reason as Error)
 })
 
 function mkResPromise<T>() {
@@ -37,6 +43,10 @@ const atomVars = {
   revSourceMap: new WeakMap<Element, number[]>(),
 }
 
+ipcRenderer.on<'set-id'>('set-id', (_evt, id) => {
+  handlerId = id
+})
+
 ipcRenderer.on<'init'>('init', (_evt, params) => {
   atomVars.mathJax.resolve(
     MathJaxController.create(params.userMacros, params.mathJaxConfig),
@@ -52,57 +62,42 @@ ipcRenderer.on<'init'>('init', (_evt, params) => {
   }
 })
 
-ipcRenderer.on<'set-source-map'>('set-source-map', (_evt, { map }) => {
-  const root = document.querySelector('div.update-preview')
-  if (!root) throw new Error('No root element!')
-  const slsm = new Map<number, Element>()
-  const rsm = new WeakMap<Element, number[]>()
-  for (const lineS of Object.keys(map)) {
-    const line = parseInt(lineS, 10)
-    const path = map[line]
-    const elem = util.resolveElement(root, path)
-    if (elem) {
-      slsm.set(line, elem)
-      const rsmel = rsm.get(elem)
-      if (rsmel) rsmel.push(line)
-      else rsm.set(elem, [line])
-    }
-  }
-  atomVars.sourceLineMap = slsm
-  atomVars.revSourceMap = rsm
+ipcRenderer.on<'set-native-keys'>('set-native-keys', (_evt, val) => {
+  nativePageScrollKeys = val
 })
 
-ipcRenderer.on<'scroll-sync'>(
-  'scroll-sync',
-  (_evt, { firstLine, lastLine }) => {
-    const mean = Math.floor(0.5 * (firstLine + lastLine))
-    const slm = atomVars.sourceLineMap
-    let topLine
-    let topBound
-    for (topLine = mean; topLine >= 0; topLine -= 1) {
-      topBound = slm.get(topLine)
-      if (topBound) break
-    }
-    if (!topBound) return
+function scrollSync({ firstLine, lastLine }: ChannelMap['scroll-sync']) {
+  if (firstLine === 0) {
+    window.scroll({ top: 0 })
+    return
+  }
+  const slm = atomVars.sourceLineMap
+  const lines = Array.from(slm.keys()).sort((a, b) => a - b)
+  let lowix = lines.findIndex((x) => x >= firstLine)
+  if (lowix > 0) lowix--
+  let highix = lines.findIndex((x) => x >= lastLine)
+  if (highix === -1) highix = lines.length - 1
+  else if (highix < lines.length - 1) highix++
+  const low = lines[lowix]
+  const high = lines[highix]
+  let norm = 0
+  let meanScroll = 0
+  const entries = Array.from(slm.entries()).slice(lowix, highix + 1)
+  for (const [line, item] of entries) {
+    const weight = line <= (high + low) / 2 ? line - low + 1 : high - line + 1
+    norm += weight
+    meanScroll += item.getBoundingClientRect().top * weight
+  }
+  if (norm === 0) return
+  const offset = document.documentElement!.scrollTop
+  const clientHeight = document.documentElement!.clientHeight
+  const top = offset - clientHeight / 2 + meanScroll / norm
+  window.scroll({ top })
+}
 
-    const max = Math.max(...Array.from(slm.keys()))
-    let bottomLine
-    let bottomBound
-    for (bottomLine = mean + 1; bottomLine < max; bottomLine += 1) {
-      bottomBound = slm.get(bottomLine)
-      if (bottomBound) break
-    }
-    if (!bottomBound) return
-    const topScroll = topBound.getBoundingClientRect().top
-    const bottomScroll = bottomBound.getBoundingClientRect().top
-    const frac = (mean - firstLine) / (lastLine - firstLine)
-    const offset = document.documentElement!.scrollTop
-    const clientHeight = document.documentElement!.clientHeight
-    const top =
-      offset - clientHeight / 2 + topScroll + frac * (bottomScroll - topScroll)
-    window.scroll({ top })
-  },
-)
+ipcRenderer.on<'scroll-sync'>('scroll-sync', (_evt, params) => {
+  scrollSync(params)
+})
 
 ipcRenderer.on<'style'>('style', (_event, { styles }) => {
   let styleElem = document.head!.querySelector('style#atom-styles')
@@ -155,41 +150,132 @@ ipcRenderer.on<'sync'>('sync', (_event, { line, flash }) => {
   }
 })
 
-let updatePreview: UpdatePreview | undefined
-
-ipcRenderer.on<'update-preview'>(
-  'update-preview',
-  async (_event, { id, html, renderLaTeX }) => {
-    // div.update-preview created after constructor st UpdatePreview cannot
-    // be instanced in the constructor
-    const preview = document.querySelector('div.update-preview')
-    if (!preview) return
-    if (!updatePreview) {
-      updatePreview = new UpdatePreview(
-        preview as HTMLElement,
-        await atomVars.mathJax,
-      )
+let updatePromise: Promise<void> | undefined
+let nextUpdateParams: ChannelMap['update-preview'] | undefined
+async function doUpdate({
+  id,
+  html,
+  renderLaTeX,
+  map,
+  diffMethod,
+  scrollSyncParams,
+}: ChannelMap['update-preview']) {
+  // div.update-preview created after constructor st UpdatePreview cannot
+  // be instanced in the constructor
+  const preview = document.querySelector('div.update-preview')
+  if (!preview) return
+  const parser = new DOMParser()
+  const domDocument = parser.parseFromString(html, 'text/html')
+  const doc = document
+  if (doc && domDocument.head!.hasChildNodes) {
+    let container = doc.head!.querySelector('original-elements')
+    if (!container) {
+      container = doc.createElement('original-elements')
+      doc.head!.insertBefore(container, doc.head!.firstElementChild)
     }
-    const parser = new DOMParser()
-    const domDocument = parser.parseFromString(html, 'text/html')
-    const doc = document
-    if (doc && domDocument.head!.hasChildNodes) {
-      let container = doc.head!.querySelector('original-elements')
-      if (!container) {
-        container = doc.createElement('original-elements')
-        doc.head!.appendChild(container)
-      }
-      container.innerHTML = ''
-      for (const headElement of Array.from(domDocument.head!.childNodes)) {
-        container.appendChild(headElement)
+    container.innerHTML = ''
+    for (const headElement of Array.from(domDocument.head!.childNodes)) {
+      container.appendChild(headElement)
+    }
+  }
+  const visibleElements = scrollSyncParams
+    ? undefined
+    : Array.from(preview.children)
+        .map((x) => ({ el: x, r: x.getBoundingClientRect() }))
+        .filter(({ r }) => r.top <= window.innerHeight && r.bottom >= 0)
+  await update(preview, domDocument.body, {
+    renderLaTeX,
+    diffMethod,
+    mjController: await atomVars.mathJax,
+  })
+  if (visibleElements) {
+    const stillVisibleElements = visibleElements.filter(
+      ({ el }) => (el as HTMLElement).offsetParent,
+    )
+    const lastEl = stillVisibleElements[stillVisibleElements.length - 1]
+    if (lastEl) {
+      window.scrollBy({
+        top: lastEl.el.getBoundingClientRect().bottom - lastEl.r.bottom,
+      })
+    }
+  }
+  if (map) {
+    const slsm = new Map<number, Element>()
+    const rsm = new WeakMap<Element, number[]>()
+    for (const [lineS, path] of Object.entries(map)) {
+      const line = parseInt(lineS, 10)
+      const elem = util.resolveElement(preview, path)
+      if (elem) {
+        slsm.set(line, elem)
+        const rsmel = rsm.get(elem)
+        if (rsmel) rsmel.push(line)
+        else rsm.set(elem, [line])
       }
     }
-    await updatePreview.update(domDocument.body, renderLaTeX)
-    ipcRenderer.sendToHost<'request-reply'>('request-reply', {
+    atomVars.sourceLineMap = slsm
+    atomVars.revSourceMap = rsm
+  }
+  if (scrollSyncParams) scrollSync(scrollSyncParams)
+  ipcRenderer.send<'atom-markdown-preview-plus-ipc-request-reply'>(
+    'atom-markdown-preview-plus-ipc-request-reply',
+    handlerId,
+    {
       id,
       request: 'update-preview',
       result: processHTMLString(preview),
-    })
+    },
+  )
+}
+
+function delayedUpdate(): Promise<void> | undefined {
+  let res
+  if (nextUpdateParams) res = doUpdate(nextUpdateParams).then(delayedUpdate)
+  nextUpdateParams = undefined
+  return res
+}
+
+ipcRenderer.on<'update-preview'>('update-preview', (_event, params) => {
+  if (!updatePromise) {
+    updatePromise = doUpdate(params)
+      .then(delayedUpdate)
+      .catch(uncaughtError)
+      .then(() => {
+        updatePromise = undefined
+      })
+  } else {
+    nextUpdateParams = params
+  }
+})
+
+ipcRenderer.on<'await-fully-ready'>(
+  'await-fully-ready',
+  async (_event, { id }) => {
+    // tslint:disable-next-line: totality-check
+    if (document.readyState === 'complete') {
+      ipcRenderer.send<'atom-markdown-preview-plus-ipc-request-reply'>(
+        'atom-markdown-preview-plus-ipc-request-reply',
+        handlerId,
+        {
+          id,
+          request: 'await-fully-ready',
+          result: void 0,
+        },
+      )
+      return
+    }
+    function loaded() {
+      ipcRenderer.send<'atom-markdown-preview-plus-ipc-request-reply'>(
+        'atom-markdown-preview-plus-ipc-request-reply',
+        handlerId,
+        {
+          id,
+          request: 'await-fully-ready',
+          result: void 0,
+        },
+      )
+      document.removeEventListener('load', loaded)
+    }
+    document.addEventListener('load', loaded)
   },
 )
 
@@ -206,15 +292,25 @@ ipcRenderer.on<'error'>('error', (_evt, { msg }) => {
   if (!preview) return
   const errorDiv = document.createElement('div')
   errorDiv.innerHTML = `<h2>Previewing Markdown Failed</h2><h3>${msg}</h3>`
-  preview.appendChild(errorDiv)
+  if (preview.firstElementChild) {
+    preview.insertBefore(errorDiv, preview.firstElementChild)
+  } else {
+    preview.appendChild(errorDiv)
+  }
 })
 
 document.addEventListener('wheel', (event) => {
   if (event.ctrlKey) {
     if (event.deltaY > 0) {
-      ipcRenderer.sendToHost<'zoom-in'>('zoom-in', undefined)
+      ipcRenderer.send<'atom-markdown-preview-plus-ipc-zoom-in'>(
+        'atom-markdown-preview-plus-ipc-zoom-in',
+        handlerId,
+      )
     } else if (event.deltaY < 0) {
-      ipcRenderer.sendToHost<'zoom-out'>('zoom-out', undefined)
+      ipcRenderer.send<'atom-markdown-preview-plus-ipc-zoom-out'>(
+        'atom-markdown-preview-plus-ipc-zoom-out',
+        handlerId,
+      )
     }
     event.preventDefault()
     event.stopPropagation()
@@ -230,15 +326,61 @@ document.addEventListener('scroll', (_event) => {
       return top > 0 && bottom < height
     })
     .map(([line, _elem]) => line)
-  ipcRenderer.sendToHost<'did-scroll-preview'>('did-scroll-preview', {
-    max: Math.max(...visible),
-    min: Math.min(...visible),
-  })
+  ipcRenderer.send<'atom-markdown-preview-plus-ipc-did-scroll-preview'>(
+    'atom-markdown-preview-plus-ipc-did-scroll-preview',
+    handlerId,
+    {
+      max: Math.max(...visible),
+      min: Math.min(...visible),
+    },
+  )
 })
+
+function keyEventHandler(type: 'keydown' | 'keyup', e: KeyboardEvent) {
+  if (
+    nativePageScrollKeys &&
+    !e.altKey &&
+    !e.ctrlKey &&
+    !e.shiftKey &&
+    !e.metaKey &&
+    e.code.match(/^(Arrow.*|Page.*|Space|Home|End)$/)
+  ) {
+    return
+  }
+  const data = {
+    type: type,
+    altKey: e.altKey,
+    ctrlKey: e.ctrlKey,
+    bubbles: e.bubbles,
+    cancelable: e.cancelable,
+    code: e.code,
+    composed: e.composed,
+    detail: e.detail,
+    isComposing: e.isComposing,
+    key: e.key,
+    location: e.location,
+    metaKey: e.metaKey,
+    repeat: e.repeat,
+    shiftKey: e.shiftKey,
+  } as const
+  ipcRenderer.send<'atom-markdown-preview-plus-ipc-key'>(
+    'atom-markdown-preview-plus-ipc-key',
+    handlerId,
+    data,
+  )
+  e.preventDefault()
+}
+
+document.addEventListener('keydown', keyEventHandler.bind(this, 'keydown'))
+document.addEventListener('keyup', keyEventHandler.bind(this, 'keyup'))
 
 let lastContextMenuTarget: HTMLElement
 document.addEventListener('contextmenu', (e) => {
   lastContextMenuTarget = e.target as HTMLElement
+  ipcRenderer.send<'atom-markdown-preview-plus-ipc-show-context-menu'>(
+    'atom-markdown-preview-plus-ipc-show-context-menu',
+    handlerId,
+  )
 })
 
 ipcRenderer.on<'sync-source'>('sync-source', (_, { id }) => {
@@ -252,32 +394,44 @@ ipcRenderer.on<'sync-source'>('sync-source', (_, { id }) => {
   }
   if (!lines) return
 
-  ipcRenderer.sendToHost<'request-reply'>('request-reply', {
-    id,
-    request: 'sync-source',
-    result: Math.min(...lines),
-  })
+  ipcRenderer.send<'atom-markdown-preview-plus-ipc-request-reply'>(
+    'atom-markdown-preview-plus-ipc-request-reply',
+    handlerId,
+    {
+      id,
+      request: 'sync-source',
+      result: Math.min(...lines),
+    },
+  )
 })
 
 ipcRenderer.on<'reload'>('reload', (_, { id }) => {
   window.onbeforeunload = null
-  ipcRenderer.sendToHost<'request-reply'>('request-reply', {
-    id,
-    request: 'reload',
-    result: undefined,
-  })
+  ipcRenderer.send<'atom-markdown-preview-plus-ipc-request-reply'>(
+    'atom-markdown-preview-plus-ipc-request-reply',
+    handlerId,
+    {
+      id,
+      request: 'reload',
+      result: undefined,
+    },
+  )
 })
 
-window.onbeforeunload = function() {
+window.onbeforeunload = function () {
   return false
 }
 
 ipcRenderer.on<'get-tex-config'>('get-tex-config', async (_, { id }) => {
-  ipcRenderer.sendToHost<'request-reply'>('request-reply', {
-    id,
-    request: 'get-tex-config',
-    result: (await atomVars.mathJax).jaxTeXConfig(),
-  })
+  ipcRenderer.send<'atom-markdown-preview-plus-ipc-request-reply'>(
+    'atom-markdown-preview-plus-ipc-request-reply',
+    handlerId,
+    {
+      id,
+      request: 'get-tex-config',
+      result: (await atomVars.mathJax).jaxTeXConfig(),
+    },
+  )
 })
 
 ipcRenderer.on<'get-selection'>('get-selection', async (_, { id }) => {
@@ -285,11 +439,15 @@ ipcRenderer.on<'get-selection'>('get-selection', async (_, { id }) => {
   const selectedText = selection && selection.toString()
   const selectedNode = selection && selection.anchorNode
 
-  ipcRenderer.sendToHost<'request-reply'>('request-reply', {
-    id,
-    request: 'get-selection',
-    result: selectedText && selectedNode ? selectedText : undefined,
-  })
+  ipcRenderer.send<'atom-markdown-preview-plus-ipc-request-reply'>(
+    'atom-markdown-preview-plus-ipc-request-reply',
+    handlerId,
+    {
+      id,
+      request: 'get-selection',
+      result: selectedText && selectedNode ? selectedText : undefined,
+    },
+  )
 })
 
 document.addEventListener('click', (event) => {

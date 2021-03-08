@@ -1,28 +1,37 @@
-import url = require('url')
+import * as url from 'url'
 import {
   SerializedMPV,
-  MarkdownPreviewViewFile,
-  MarkdownPreviewViewEditor,
   MarkdownPreviewView,
+  createEditorView,
+  createFileView,
+  viewForEditor,
+  openPreviewPane,
+  createTextView,
 } from './markdown-preview-view'
-// import mathjaxHelper = require('./mathjax-helper')
 import {
   TextEditor,
-  WorkspaceOpenOptions,
   CommandEvent,
   CompositeDisposable,
   ContextMenuOptions,
+  File,
+  Disposable,
 } from 'atom'
+import type { getToolBarManager } from 'atom/tool-bar'
+import * as path from 'path'
 import * as util from './util'
 import { PlaceholderView } from './placeholder-view'
 import { migrateConfig } from './migrate-config'
-import { MarkdownPreviewViewEditorRemote } from './markdown-preview-view/markdown-preview-view-editor-remote'
+import { selectListView } from './select-list-view'
+import * as pdf from './markdown-preview-view/pdf-export-util'
+import { getUserMacrosPath } from './macros-util'
+import { BrowserWindowHandler } from './markdown-preview-view/browserwindow-handler'
+import { MarkdownItWorker } from './markdown-it-helper'
 
 export { config } from './config'
 
 let disposables: CompositeDisposable | undefined
 
-export async function activate() {
+export function activate() {
   if (migrateConfig()) {
     atom.notifications.addInfo(
       'Markdown-Preivew-Plus has updated your config to a new format. ' +
@@ -32,7 +41,7 @@ export async function activate() {
     )
   }
   if (atom.packages.isPackageActive('markdown-preview')) {
-    await atom.packages.deactivatePackage('markdown-preview')
+    util.handlePromise(atom.packages.deactivatePackage('markdown-preview'))
   }
   if (!atom.packages.isPackageDisabled('markdown-preview')) {
     atom.packages.disablePackage('markdown-preview')
@@ -47,9 +56,18 @@ export async function activate() {
       'markdown-preview-plus:toggle': close,
     }),
     atom.commands.add('atom-workspace', {
+      'markdown-preview-plus:open-configuration': () => {
+        util.handlePromise(
+          atom.workspace.open('atom://config/packages/markdown-preview-plus'),
+        )
+      },
+      'markdown-preview-plus:edit-macros': () => {
+        util.handlePromise(
+          atom.workspace.open(getUserMacrosPath(atom.getConfigDirPath())),
+        )
+      },
       'markdown-preview-plus:select-syntax-theme': async () => {
         try {
-          const { selectListView } = await import('./select-list-view')
           const themeNames = atom.themes.getLoadedThemeNames()
           if (themeNames === undefined) return
           const theme = await selectListView(
@@ -69,7 +87,7 @@ export async function activate() {
     atom.commands.add('atom-text-editor', {
       'markdown-preview-plus:toggle-render-latex': (e) => {
         const editor = e.currentTarget.getModel()
-        const view = MarkdownPreviewViewEditor.viewForEditor(editor)
+        const view = viewForEditor(editor)
         if (view) view.toggleRenderLatex()
       },
     }),
@@ -78,6 +96,10 @@ export async function activate() {
         const view = MarkdownPreviewView.viewForElement(e.currentTarget)
         if (view) view.toggleRenderLatex()
       },
+    }),
+    atom.commands.add('.tree-view', {
+      'markdown-preview-plus:preview-file': previewFile,
+      'markdown-preview-plus:make-pdf': makePDF,
     }),
     atom.workspace.addOpener(opener),
     atom.config.observe(
@@ -92,14 +114,19 @@ export async function activate() {
 }
 
 export function deactivate() {
+  MarkdownItWorker.destroy()
   disposables && disposables.dispose()
+  disposables = undefined
+  BrowserWindowHandler.clean()
 }
 
 export function createMarkdownPreviewView(state: SerializedMPV) {
   if (state.editorId !== undefined) {
     return new PlaceholderView(state.editorId)
   } else if (state.filePath && util.isFileSync(state.filePath)) {
-    return new MarkdownPreviewViewFile(state.filePath)
+    return createFileView(state.filePath)
+  } else if (state.text) {
+    return createTextView(state.text)
   }
   return undefined
 }
@@ -110,8 +137,8 @@ async function close(event: CommandEvent<HTMLElement>): Promise<void> {
   const item = MarkdownPreviewView.viewForElement(event.currentTarget)
   if (!item) return
   const pane = atom.workspace.paneForItem(item)
-  if (!pane) return
-  await pane.destroyItem(item)
+  if (!pane) item.destroy()
+  else await pane.destroyItem(item)
 }
 
 async function toggle(editor: TextEditor) {
@@ -120,36 +147,44 @@ async function toggle(editor: TextEditor) {
 }
 
 function removePreviewForEditor(editor: TextEditor) {
-  const item = MarkdownPreviewViewEditor.viewForEditor(editor)
+  const item = viewForEditor(editor)
   if (!item) return false
   const previewPane = atom.workspace.paneForItem(item)
-  if (!previewPane) return false
-  if (item !== previewPane.getActiveItem()) {
-    previewPane.activateItem(item)
-    return false
+  if (previewPane) {
+    if (item !== previewPane.getActiveItem()) {
+      previewPane.activateItem(item)
+      return true
+    }
+    util.handlePromise(previewPane.destroyItem(item))
+  } else {
+    const win = BrowserWindowHandler.windowForView(item)
+    if (win && !win.isFocused()) {
+      win.focus()
+      return true
+    }
+    item.destroy()
   }
-  util.handlePromise(previewPane.destroyItem(item))
   return true
 }
 
 async function addPreviewForEditor(editor: TextEditor) {
-  const previousActivePane = atom.workspace.getActivePane()
-  const options: WorkspaceOpenOptions = { searchAllPanes: true }
-  const splitConfig = util.atomConfig().previewConfig.previewSplitPaneDir
-  if (splitConfig !== 'none') {
-    options.split = splitConfig
-  }
-  const res = await atom.workspace.open(
-    MarkdownPreviewViewEditor.create(editor),
-    options,
-  )
-  previousActivePane.activate()
-  return res
+  return openPreviewPane(createEditorView(editor))
 }
 
-async function previewFile({ currentTarget }: CommandEvent): Promise<void> {
-  const filePath = (currentTarget as HTMLElement).dataset.path
+async function previewFile(evt: CommandEvent): Promise<void> {
+  const { currentTarget } = evt
+  const fileEntry = (currentTarget as HTMLElement).querySelector(
+    '.entry.file.selected .name',
+  )
+  const filePath = (fileEntry as HTMLElement).dataset.path
   if (!filePath) {
+    evt.abortKeyBinding()
+    return
+  }
+  const ext = path.extname(filePath).substr(1)
+  const exts = util.atomConfig().extensions
+  if (!exts.includes(ext)) {
+    evt.abortKeyBinding()
     return
   }
 
@@ -184,7 +219,7 @@ function configObserver<T>(
   ) => void,
 ) {
   let configDisposables: CompositeDisposable
-  return function(value: T) {
+  return function (value: T) {
     if (!disposables) return
     if (configDisposables) {
       configDisposables.dispose()
@@ -198,24 +233,17 @@ function configObserver<T>(
   }
 }
 
-function registerExtensions(
-  extensions: string[],
-  disp: CompositeDisposable,
-  cm: ContextMenu,
-) {
+function registerExtensions(extensions: string[], _: any, cm: ContextMenu) {
   for (const ext of extensions) {
     const selector = `.tree-view .file .name[data-name$=".${ext}"]`
-    disp.add(
-      atom.commands.add(
-        selector,
-        'markdown-preview-plus:preview-file',
-        previewFile,
-      ),
-    )
     cm[selector] = [
       {
         label: 'Markdown Preview',
         command: 'markdown-preview-plus:preview-file',
+      },
+      {
+        label: 'Make PDF',
+        command: 'markdown-preview-plus:make-pdf',
       },
     ]
   }
@@ -252,6 +280,48 @@ function registerGrammars(
   }
 }
 
+async function makePDF(evt: CommandEvent): Promise<void> {
+  const { currentTarget } = evt
+  const fileEntries = (currentTarget as HTMLElement).querySelectorAll(
+    '.entry.file.selected .name',
+  )
+  async function go(filePath?: string) {
+    if (filePath === undefined) return
+    const f = new File(filePath)
+    const text = await f.read()
+    if (text === null) return
+    const savePath = filePath + '.pdf'
+    const saveFile = new File(savePath)
+    if (
+      (await saveFile.exists()) &&
+      !util.atomConfig().saveConfig.makePDFOverwrite
+    ) {
+      atom.notifications.addInfo(
+        `${saveFile.getBaseName()} exists, will not overwrite`,
+      )
+      return
+    }
+
+    await pdf.saveAsPDF(
+      text,
+      filePath,
+      undefined,
+      util.atomConfig().mathConfig.enableLatexRenderingByDefault,
+      savePath,
+    )
+  }
+  const exts = util.atomConfig().extensions
+  const paths = Array.from(fileEntries)
+    .map((x) => (x as HTMLElement).dataset.path)
+    .filter((x) => x !== undefined && exts.includes(path.extname(x).substr(1)))
+    .map(go)
+  if (paths.length === 0) {
+    evt.abortKeyBinding()
+    return
+  }
+  await Promise.all(paths)
+}
+
 function opener(uriToOpen: string) {
   try {
     // tslint:disable-next-line:no-var-keyword prefer-const
@@ -273,16 +343,39 @@ function opener(uriToOpen: string) {
   }
 
   if (uri.hostname === 'file') {
-    return new MarkdownPreviewViewFile(pathname.slice(1))
-  } else if (uri.hostname === 'remote-editor') {
-    const [windowId, editorId] = pathname
-      .slice(1)
-      .split('/')
-      .map((x) => parseInt(x, 10))
-    return new MarkdownPreviewViewEditorRemote(windowId, editorId)
+    return createFileView(pathname.slice(1))
+  } else if (uri.hostname === 'editor') {
+    const editorId = parseInt(pathname.slice(1), 10)
+    const editor = atom.workspace
+      .getTextEditors()
+      .find((ed) => ed.id === editorId)
+    if (editor === undefined) {
+      atom.notifications.addWarning(
+        'Markdown-preview-plus: Tried to open preview ' +
+          `for editor with id ${editorId}, which does not exist`,
+      )
+      return undefined
+    }
+    return createEditorView(editor)
   } else {
     throw new Error(
       `Tried to open markdown-preview-plus with uri ${uriToOpen}. This is not supported. Please report this error.`,
     )
   }
+}
+
+export function consumeToolBar(getToolBar: getToolBarManager) {
+  if (!disposables) return
+  if (atom.config.get('markdown-preview-plus.disableToolBarIntegration')) return
+  const toolbar = getToolBar('markdown-preview-plus')
+  toolbar.addButton({
+    icon: 'markdown',
+    callback: 'markdown-preview-plus:toggle',
+    tooltip: 'Markdown Preview',
+  })
+  disposables.add(
+    new Disposable(function () {
+      toolbar.removeItems()
+    }),
+  )
 }

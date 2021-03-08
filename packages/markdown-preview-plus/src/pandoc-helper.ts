@@ -1,24 +1,13 @@
-import CP = require('child_process')
-import fs = require('fs')
-import path = require('path')
+import * as CP from 'child_process'
+import * as fs from 'fs'
+import * as path from 'path'
 import { atomConfig } from './util'
 
 /**
  * Sets local mathjaxPath if available
  */
-const getMathJaxPath = (function() {
-  let cached: string | null = null
-  return function() {
-    if (cached !== null) {
-      return cached
-    }
-    try {
-      return (cached = require.resolve('mathjax'))
-    } catch (e) {
-      return ''
-    }
-  }
-})()
+const mathJaxPath =
+  'atom://markdown-preview-plus/node_modules/mathjax/MathJax.js'
 
 function findFileRecursive(filePath: string, fileName: string): string | false {
   const bibFile = path.join(filePath, '../', fileName)
@@ -50,12 +39,11 @@ function setPandocOptions(filePath: string | undefined, renderMath: boolean) {
   if (filePath !== undefined) {
     opts.cwd = path.dirname(filePath)
   }
-  const mathjaxPath = getMathJaxPath()
   const config = atomConfig().pandocConfig
   const args: Args = {
     from: config.pandocMarkdownFlavor,
     to: 'html',
-    mathjax: renderMath ? mathjaxPath : undefined,
+    mathjax: renderMath ? mathJaxPath : undefined,
     filter: config.pandocFilters,
   }
   if (config.pandocBibliography) {
@@ -94,7 +82,7 @@ function handleError(error: string, html: string, renderMath: boolean): never {
 function handleMath(html: string): string {
   const doc = document.createElement('div')
   doc.innerHTML = html
-  doc.querySelectorAll('.math').forEach(function(elem) {
+  doc.querySelectorAll('.math').forEach(function (elem) {
     let math = (elem as HTMLElement).innerText
     // Set mode if it is block math
     const mode = math.indexOf('\\[') > -1 ? '; mode=display' : ''
@@ -157,32 +145,46 @@ export async function renderPandoc(
   text: string,
   filePath: string | undefined,
   renderMath: boolean,
+  showErrors: boolean,
 ): Promise<string> {
   const { args, opts } = setPandocOptions(filePath, renderMath)
-  return new Promise<string>((resolve, reject) => {
-    const cp = CP.execFile(
-      atomConfig().pandocConfig.pandocPath,
-      getArguments(args),
-      opts,
-      function(error, stdout, stderr) {
-        if (error) {
-          atom.notifications.addError(error.toString(), {
-            stack: error.stack,
-            dismissable: true,
-          })
-          reject(error)
-        }
-        try {
-          const result = handleResponse(stderr || '', stdout || '', renderMath)
-          resolve(result)
-        } catch (e) {
-          reject(e)
-        }
-      },
-    )
-    cp.stdin.write(text)
-    cp.stdin.end()
-  })
+  let interval: number | undefined
+  try {
+    return await new Promise<string>((resolve, reject) => {
+      const cp = CP.execFile(
+        atomConfig().pandocConfig.pandocPath,
+        getArguments(args),
+        opts,
+        function (error, stdout, stderr) {
+          if (error) {
+            atom.notifications.addError(error.toString(), {
+              stack: error.stack,
+              dismissable: true,
+            })
+            reject(error)
+          }
+          try {
+            const result = handleResponse(
+              showErrors ? stderr || '' : '',
+              stdout || '',
+              renderMath,
+            )
+            resolve(result)
+          } catch (e) {
+            reject(e)
+          }
+        },
+      )
+      if (!cp.stdin) throw new Error('No stdin')
+      cp.stdin.write(text)
+      cp.stdin.end()
+      interval = window.setInterval(() => {
+        process.activateUvLoop()
+      }, 100)
+    })
+  } finally {
+    if (interval !== undefined) clearInterval(interval)
+  }
 }
 
 function getArguments(iargs: Args) {

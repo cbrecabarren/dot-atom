@@ -90,14 +90,14 @@ literally display a dollar sign you can use `\$`.
 ## Macros
 
 MPP supports persistent [macro definitions](http://docs.mathjax.org/en/latest/tex.html#defining-tex-macros).
-Macros belong in `~/.atom/markdown-preview-plus.cson` and are defined as follows.
+Macros belong in `~/.atom/markdown-preview-plus.yaml` and are defined as follows.
 
 ### Macro Definition Syntax
 
 #### Zero argument macros
 
 To define a macro that takes no arguments (like `\sin`) just wrap it in quotes like so
-```cson
+```yaml
 # This is just an alias for \theta.
 th: "\\theta"
 ```
@@ -106,12 +106,28 @@ th: "\\theta"
 
 To define a macro that takes arguments (like `\frac`), use an array that specifies
 the number of arguments allowed. Then refer to the arguments as `#1` `#2` like so:
-```cson
+```yaml
 # This one gives you "1 over something" as a fraction.
 inv: ["\\frac{1}{#1}",1]
 
 # This one gives you a fraction with nicely typeset parentheses on either side.
 pfrac: ["\\left(\\frac{#1}{#2}\\right)",2]
+```
+
+Note that Atom's default YAML grammar can get a little bit confused with the bracket syntax
+("flow sequence syntax").
+If this is an issue, you can use the YAML "block sequence syntax" instead:
+
+```yaml
+# This one gives you "1 over something" as a fraction.
+inv:
+- "\\frac{1}{#1}"
+- 1
+
+# This one gives you a fraction with nicely typeset parentheses on either side.
+pfrac:
+- "\\left(\\frac{#1}{#2}\\right)"
+- 2
 ```
 
 #### Macro Names
@@ -123,17 +139,17 @@ Macros need to be named with either
 Please see [this](http://tex.stackexchange.com/questions/66666/command-macro-name-cannot-include-numbers-and-symbols)
 StackExchange discussion.
 
-Note that since we define the objects in CSON, if you want to use a single non-alphanumeric
-character for the name of your macro like
+Note that since we define the objects in YAML, if you want to use a single non-alphanumeric
+character, you need to put it in quotes (single or double), so don't do this:
 
-```cson
-!: "{OK}"
+```yaml
+!: "{OK}" # WRONG
 ```
 
-MPP will fail because CSON will throw an `unexpected !` syntax error. So be sure to write such definitions as a string. The following will work fine:
+do this:
 
-```cson
-'!': "{OK}"
+```yaml
+'!': "{OK}" # OK
 ```    
 
 [gfm]: https://help.github.com/articles/github-flavored-markdown/

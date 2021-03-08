@@ -1,6 +1,5 @@
-import * as MarkdownIt from 'markdown-it'
-
-declare interface ChannelMap {
+export type TDiffMethod = 'none' | 'heuristic' | 'myers'
+export interface ChannelMap {
   style: { styles: string[] }
   'update-images': { oldsrc: string; v: number | undefined }
   sync: { line: number; flash: boolean }
@@ -8,6 +7,9 @@ declare interface ChannelMap {
     id: number
     html: string
     renderLaTeX: boolean
+    map?: { [line: number]: Array<{ tag: string; index: number }> }
+    diffMethod: TDiffMethod
+    scrollSyncParams?: ChannelMap['scroll-sync']
   }
   error: { msg: string }
   init: {
@@ -15,41 +17,53 @@ declare interface ChannelMap {
     mathJaxConfig: MathJaxConfig
   } & (
     | { context: 'live-preview' | 'copy-html' }
-    | { context: 'pdf-export'; pdfExportOptions: { width: number } })
+    | { context: 'pdf-export'; pdfExportOptions: { width: number } }
+  )
+  'set-native-keys': boolean
   'set-base-path': { path?: string }
-  'set-source-map': {
-    map: { [line: number]: Array<{ tag: string; index: number }> }
-  }
   'scroll-sync': { firstLine: number; lastLine: number }
+  'set-id': number
   // actual requests
   'get-tex-config': { id: number }
   'sync-source': { id: number }
   reload: { id: number }
   'get-selection': { id: number }
+  'await-fully-ready': { id: number }
 }
-declare interface ReplyMap {
-  'zoom-in': void
-  'zoom-out': void
-  'uncaught-error': { message: string; name: string; stack?: string }
-  'did-scroll-preview': { max: number; min: number }
+export interface ReplyMap {
+  'atom-markdown-preview-plus-ipc-zoom-in': []
+  'atom-markdown-preview-plus-ipc-zoom-out': []
+  'atom-markdown-preview-plus-ipc-key': [
+    KeyboardEventInit & { type: 'keydown' | 'keyup' },
+  ]
+  'atom-markdown-preview-plus-ipc-uncaught-error': [
+    { message: string; name: string; stack?: string },
+  ]
+  'atom-markdown-preview-plus-ipc-did-scroll-preview': [
+    { max: number; min: number },
+  ]
+  'atom-markdown-preview-plus-ipc-show-context-menu': []
   // actual replies
-  'request-reply': RequestReplyType[keyof RequestReplyMap]
+  'atom-markdown-preview-plus-ipc-request-reply': [
+    RequestReplyType[keyof RequestReplyMap],
+  ]
 }
-declare interface RequestReplyMap {
+export interface RequestReplyMap {
   'update-preview': string
   'get-tex-config': MathJax.TeXInputProcessor
   reload: void
+  'await-fully-ready': void
   'sync-source': number | undefined
   'get-selection': string | undefined
 }
-declare type RequestReplyType = {
+export type RequestReplyType = {
   [K in keyof RequestReplyMap]: {
     id: number
     request: K
     result: RequestReplyMap[K]
   }
 }
-declare type ReplyMapEvents = {
+export type ReplyMapEvents = {
   [K in keyof ReplyMap]: Electron.IpcMessageEventCustomFixed<K>
 }
 declare global {
@@ -59,19 +73,14 @@ declare global {
         channel: T,
         cb: (evt: Event, value: ChannelMap[T]) => void,
       ): IpcRenderer
-      sendToHost<T extends keyof ReplyMap>(ch: T, arg: ReplyMap[T]): void
-    }
-    interface WebviewTag {
-      send<T extends keyof ChannelMap>(channel: T, value: ChannelMap[T]): void
-      addEventListener(
-        s: 'ipc-message',
-        h: (e: IpcMessageEventCustom) => void,
+      send<T extends keyof ReplyMap>(
+        ch: T,
+        id: number,
+        ...args: ReplyMap[T]
       ): void
     }
-    type IpcMessageEventCustom = ReplyMapEvents[keyof ReplyMapEvents]
-    type IpcMessageEventCustomFixed<T extends keyof ReplyMap> = {
-      channel: T
-      args: [ReplyMap[T]]
+    interface WebContents {
+      send<T extends keyof ChannelMap>(channel: T, value: ChannelMap[T]): void
     }
   }
 
